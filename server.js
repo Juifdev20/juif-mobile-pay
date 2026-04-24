@@ -65,7 +65,8 @@ function saveApiKeys(apiKeys) {
 
 // Helper: Générer une clé API unique
 function generateApiKey() {
-    return 'jpay_' + crypto.randomBytes(16).toString('hex');
+    const randomPart = crypto.randomBytes(16).toString('hex');
+    return 'JUIFMOBILEPAYAPI_' + randomPart;
 }
 
 // Helper: Vérifier la clé API

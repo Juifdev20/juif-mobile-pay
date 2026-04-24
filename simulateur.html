@@ -677,11 +677,21 @@
 
         @media (max-width: 768px) {
             .header {
-                padding: 15px 20px;
+                padding: 12px 15px;
+                flex-wrap: wrap;
             }
 
             .logo-text {
-                font-size: 1.1rem;
+                font-size: 1rem;
+            }
+
+            .header-actions {
+                gap: 8px;
+            }
+
+            .action-btn {
+                padding: 8px 12px;
+                font-size: 0.8rem;
             }
 
             .main-content {
@@ -748,10 +758,286 @@
             background: var(--gradient);
             border-radius: 4px;
         }
+
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(5px);
+    }
+
+    .modal.show {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-content {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        border-radius: 20px;
+        padding: 30px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        border: 1px solid var(--border);
+        animation: modalSlideIn 0.3s ease-out;
+    }
+
+    @keyframes modalSlideIn {
+        from {
+            transform: translateY(-50px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .modal-header h3 {
+        font-size: 24px;
+        margin: 0;
+        color: var(--accent);
+    }
+
+    .modal-header h3 i {
+        margin-right: 10px;
+    }
+
+    .modal-close {
+        background: transparent;
+        border: none;
+        color: var(--text-secondary);
+        font-size: 32px;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+
+    .modal-close:hover {
+        color: var(--accent);
+    }
+
+    .modal-body {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .form-group label {
+        font-size: 14px;
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    .form-group input {
+        padding: 12px 15px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        font-size: 16px;
+        outline: none;
+        transition: all 0.3s;
+    }
+
+    .form-group input:focus {
+        border-color: var(--accent);
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    .form-group input::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .btn-generate {
+        padding: 14px 20px;
+        border-radius: 10px;
+        border: none;
+        background: linear-gradient(135deg, var(--accent) 0%, #ffaa00 100%);
+        color: var(--primary);
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .btn-generate:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+    }
+
+    .loading-spinner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        padding: 20px;
+    }
+
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(255, 215, 0, 0.2);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .loading-spinner p {
+        color: var(--text-secondary);
+        font-size: 14px;
+    }
+
+    .api-result {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .success-message {
+        color: #4CAF50;
+        font-size: 16px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .api-key-display {
+        display: flex;
+        gap: 10px;
+    }
+
+    .api-key-display input {
+        flex: 1;
+        padding: 12px 15px;
+        border-radius: 10px;
+        border: 1px solid var(--accent);
+        background: rgba(255, 215, 0, 0.1);
+        color: var(--accent);
+        font-size: 14px;
+        font-family: 'Courier New', monospace;
+        outline: none;
+    }
+
+    .copy-btn {
+        padding: 12px 20px;
+        border-radius: 10px;
+        border: none;
+        background: var(--accent);
+        color: var(--primary);
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+    }
+
+    .copy-btn:hover {
+        background: #ffaa00;
+    }
+
+    .info-message {
+        color: var(--text-secondary);
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    /* Responsive Modal */
+    @media (max-width: 600px) {
+        .modal-content {
+            width: 95%;
+            padding: 20px;
+        }
+
+        .modal-header h3 {
+            font-size: 20px;
+        }
+
+        .api-key-display {
+            flex-direction: column;
+        }
+
+        .copy-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
     </style>
 </head>
 <body>
     <div class="bg-animation"></div>
+
+    <!-- Modal Génération Clé API -->
+    <div id="api-key-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-key"></i> Générer Clé API</h3>
+                <button class="modal-close" onclick="closeApiKeyModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="api-name">Nom complet</label>
+                    <input type="text" id="api-name" placeholder="Votre nom" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="api-email">Email</label>
+                    <input type="email" id="api-email" placeholder="votre@email.com" autocomplete="off">
+                </div>
+                <button class="btn-generate" onclick="generateApiKey()" id="generate-btn">
+                    <i class="fas fa-key"></i> Générer ma clé API
+                </button>
+                <div id="loading-spinner" class="loading-spinner" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Génération de votre clé API en cours...</p>
+                </div>
+                <div id="api-result" class="api-result" style="display: none;">
+                    <p class="success-message"><i class="fas fa-check-circle"></i> Clé API générée avec succès !</p>
+                    <div class="api-key-display">
+                        <input type="text" id="generated-api-key" readonly>
+                        <button class="copy-btn" onclick="copyApiKey()">
+                            <i class="fas fa-copy"></i> Copier
+                        </button>
+                    </div>
+                    <p class="info-message"><i class="fas fa-info-circle"></i> Votre clé API a été automatiquement sauvegardée.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <header class="header">
         <div class="logo">
@@ -761,11 +1047,7 @@
             <div class="logo-text">Juif Mobile <span>Pay</span></div>
         </div>
         <div class="header-actions">
-            <input type="text" id="api-key-input" placeholder="Clé API" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: rgba(255,255,255,0.1); color: white; width: 150px; font-size: 14px;">
-            <button class="action-btn" onclick="saveApiKey()" style="padding: 8px 12px; font-size: 12px;" title="Sauvegarder">
-                <i class="fas fa-save"></i>
-            </button>
-            <button class="action-btn" onclick="generateApiKey()" style="padding: 8px 12px; font-size: 12px;" title="Générer clé">
+            <button class="action-btn" onclick="showApiKeyModal()" style="padding: 8px 12px; font-size: 12px;" title="Générer clé API">
                 <i class="fas fa-key"></i>
             </button>
             <button class="action-btn" onclick="installApp()" id="install-btn" style="display: none;">
@@ -932,24 +1214,43 @@
             return headers;
         }
 
-        // Sauvegarder la clé API
-        function saveApiKey() {
-            const input = document.getElementById('api-key-input');
-            if (input.value) {
-                setApiKey(input.value);
-                alert('Clé API sauvegardée !');
-            }
+        // Afficher la modal de génération de clé API
+        function showApiKeyModal() {
+            document.getElementById('api-key-modal').classList.add('show');
+            // Reset form
+            document.getElementById('api-name').value = '';
+            document.getElementById('api-email').value = '';
+            document.getElementById('generate-btn').style.display = 'flex';
+            document.getElementById('loading-spinner').style.display = 'none';
+            document.getElementById('api-result').style.display = 'none';
+        }
+
+        // Fermer la modal
+        function closeApiKeyModal() {
+            document.getElementById('api-key-modal').classList.remove('show');
+        }
+
+        // Copier la clé API
+        function copyApiKey() {
+            const apiKeyInput = document.getElementById('generated-api-key');
+            apiKeyInput.select();
+            document.execCommand('copy');
+            alert('Clé API copiée !');
         }
 
         // Générer une nouvelle clé API
         async function generateApiKey() {
-            const name = prompt('Entrez votre nom :');
-            const email = prompt('Entrez votre email :');
+            const name = document.getElementById('api-name').value.trim();
+            const email = document.getElementById('api-email').value.trim();
             
             if (!name || !email) {
                 alert('Nom et email requis !');
                 return;
             }
+            
+            // Afficher le spinner
+            document.getElementById('generate-btn').style.display = 'none';
+            document.getElementById('loading-spinner').style.display = 'flex';
             
             try {
                 const response = await fetch(`${API_BASE}/generate_key`, {
@@ -962,25 +1263,28 @@
                 
                 const data = await response.json();
                 
+                // Cacher le spinner
+                document.getElementById('loading-spinner').style.display = 'none';
+                
                 if (data.success) {
                     setApiKey(data.api_key);
-                    document.getElementById('api-key-input').value = data.api_key;
-                    alert(`Clé API générée avec succès !\n\nClé : ${data.api_key}\n\nConservez-la en sécurité !`);
+                    document.getElementById('generated-api-key').value = data.api_key;
+                    document.getElementById('api-result').style.display = 'flex';
                 } else {
+                    document.getElementById('generate-btn').style.display = 'flex';
                     alert('Erreur lors de la génération de la clé API : ' + data.message);
                 }
             } catch (error) {
                 console.error('Erreur:', error);
+                document.getElementById('loading-spinner').style.display = 'none';
+                document.getElementById('generate-btn').style.display = 'flex';
                 alert('Erreur lors de la génération de la clé API');
             }
         }
 
         // Charger la clé API au démarrage
         window.addEventListener('DOMContentLoaded', () => {
-            const input = document.getElementById('api-key-input');
-            if (input && apiKey) {
-                input.value = apiKey;
-            }
+            // La clé est déjà chargée via localStorage
         });
 
         // PWA Install Prompt
