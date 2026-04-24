@@ -24,6 +24,12 @@ app.use(express.json());
 app.use(express.static(__dirname));
 app.use(express.static(path.join(__dirname, '..')));  // Servir le dossier parent (exame-ecommerce)
 
+// Créer transactions.json s'il n'existe pas
+if (!fs.existsSync(TRANSACTIONS_FILE)) {
+    fs.writeFileSync(TRANSACTIONS_FILE, JSON.stringify([], null, 2));
+    console.log('Fichier transactions.json créé');
+}
+
 // Helper: Charger les transactions
 function loadTransactions() {
     try {
