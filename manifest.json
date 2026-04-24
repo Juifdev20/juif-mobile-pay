@@ -6,7 +6,8 @@
   "display": "standalone",
   "background_color": "#16213e",
   "theme_color": "#16213e",
-  "orientation": "portrait",
+  "orientation": "any",
+  "scope": "/",
   "icons": [
     {
       "src": "/icon-192.png",
@@ -21,7 +22,16 @@
       "purpose": "any maskable"
     }
   ],
-  "screenshots": [],
+  "screenshots": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Simulateur de paiement mobile"
+    }
+  ],
   "categories": ["finance", "business"],
-  "lang": "fr"
+  "lang": "fr",
+  "dir": "ltr"
 }

@@ -2063,13 +2063,37 @@
 
         // PWA Install Prompt
         window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('beforeinstallprompt event fired');
             e.preventDefault();
             deferredPrompt = e;
             const installBtn = document.getElementById('install-btn');
             if (installBtn) {
-                installBtn.style.display = 'block';
+                installBtn.style.display = 'inline-flex';
+                console.log('Install button shown');
             }
         });
+
+        // Vérifier si l'app est déjà installée
+        window.addEventListener('appinstalled', () => {
+            console.log('App was installed');
+            deferredPrompt = null;
+            const installBtn = document.getElementById('install-btn');
+            if (installBtn) {
+                installBtn.style.display = 'none';
+            }
+        });
+
+        // Forcer l'affichage du bouton après 3 secondes (pour test)
+        setTimeout(() => {
+            const installBtn = document.getElementById('install-btn');
+            if (installBtn && !window.matchMedia('(display-mode: standalone)').matches) {
+                // Vérifier si l'app n'est pas déjà installée
+                if (!navigator.standalone) {
+                    installBtn.style.display = 'inline-flex';
+                    console.log('Install button shown by timeout');
+                }
+            }
+        }, 3000);
 
         // ==========================================
         // ADMIN FUNCTIONS
@@ -2442,6 +2466,223 @@
             }
         `;
         document.head.appendChild(style);
+
+        // ==========================================
+        // PWA INSTALL BANNER
+        // ==========================================
+
+        // Créer la bannière d'installation
+        function createInstallBanner() {
+            const banner = document.createElement('div');
+            banner.id = 'pwa-install-banner';
+            banner.innerHTML = `
+                <div class="install-banner-content">
+                    <div class="install-banner-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div class="install-banner-text">
+                        <strong>Installer Juif Mobile Pay</strong>
+                        <span>Ajoutez cette application à votre écran d'accueil pour un accès rapide</span>
+                    </div>
+                    <button class="install-banner-btn" onclick="installAppFromBanner()">
+                        <i class="fas fa-download"></i> Installer
+                    </button>
+                    <button class="install-banner-close" onclick="closeInstallBanner()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(banner);
+
+            // Ajouter les styles
+            const bannerStyle = document.createElement('style');
+            bannerStyle.textContent = `
+                #pwa-install-banner {
+                    position: fixed;
+                    bottom: 20px;
+                    left: 50%;
+                    transform: translateX(-50%) translateY(150%);
+                    background: linear-gradient(135deg, #16213e 0%, #1a1a2e 100%);
+                    border: 2px solid var(--accent);
+                    border-radius: 16px;
+                    padding: 15px 20px;
+                    box-shadow: 0 10px 40px rgba(0,0,0,0.4), 0 0 20px rgba(255,170,0,0.2);
+                    z-index: 10000;
+                    max-width: 90%;
+                    width: 400px;
+                    animation: bannerSlideUp 0.6s ease forwards;
+                    animation-delay: 2s;
+                }
+
+                @keyframes bannerSlideUp {
+                    from {
+                        transform: translateX(-50%) translateY(150%);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateX(-50%) translateY(0);
+                        opacity: 1;
+                    }
+                }
+
+                @keyframes bannerPulse {
+                    0%, 100% {
+                        box-shadow: 0 10px 40px rgba(0,0,0,0.4), 0 0 20px rgba(255,170,0,0.2);
+                    }
+                    50% {
+                        box-shadow: 0 10px 40px rgba(0,0,0,0.4), 0 0 30px rgba(255,170,0,0.5);
+                    }
+                }
+
+                #pwa-install-banner.show {
+                    animation: bannerSlideUp 0.6s ease forwards, bannerPulse 2s ease-in-out infinite 0.6s;
+                }
+
+                .install-banner-content {
+                    display: flex;
+                    align-items: center;
+                    gap: 15px;
+                }
+
+                .install-banner-icon {
+                    width: 50px;
+                    height: 50px;
+                    background: linear-gradient(135deg, var(--accent) 0%, #ffaa00 100%);
+                    border-radius: 12px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 24px;
+                    color: var(--primary);
+                    flex-shrink: 0;
+                    animation: iconBounce 1s ease-in-out infinite;
+                }
+
+                @keyframes iconBounce {
+                    0%, 100% { transform: scale(1); }
+                    50% { transform: scale(1.1); }
+                }
+
+                .install-banner-text {
+                    flex: 1;
+                    color: white;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 3px;
+                }
+
+                .install-banner-text strong {
+                    font-size: 16px;
+                    color: var(--accent);
+                }
+
+                .install-banner-text span {
+                    font-size: 12px;
+                    color: rgba(255,255,255,0.8);
+                }
+
+                .install-banner-btn {
+                    background: linear-gradient(135deg, var(--accent) 0%, #ffaa00 100%);
+                    color: var(--primary);
+                    border: none;
+                    padding: 10px 18px;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    font-size: 14px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    transition: all 0.3s;
+                    flex-shrink: 0;
+                }
+
+                .install-banner-btn:hover {
+                    transform: scale(1.05);
+                    box-shadow: 0 5px 15px rgba(255,170,0,0.4);
+                }
+
+                .install-banner-close {
+                    background: rgba(255,255,255,0.1);
+                    border: none;
+                    color: rgba(255,255,255,0.6);
+                    width: 28px;
+                    height: 28px;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.3s;
+                    flex-shrink: 0;
+                    margin-left: 5px;
+                }
+
+                .install-banner-close:hover {
+                    background: rgba(255,255,255,0.2);
+                    color: white;
+                }
+
+                @media (max-width: 480px) {
+                    #pwa-install-banner {
+                        width: calc(100% - 40px);
+                        bottom: 80px;
+                    }
+
+                    .install-banner-text span {
+                        font-size: 11px;
+                    }
+
+                    .install-banner-btn {
+                        padding: 8px 12px;
+                        font-size: 12px;
+                    }
+                }
+            `;
+            document.head.appendChild(bannerStyle);
+
+            // Marquer comme montré
+            setTimeout(() => {
+                banner.classList.add('show');
+            }, 100);
+        }
+
+        function closeInstallBanner() {
+            const banner = document.getElementById('pwa-install-banner');
+            if (banner) {
+                banner.style.animation = 'bannerSlideUp 0.4s ease reverse forwards';
+                setTimeout(() => {
+                    banner.remove();
+                }, 400);
+            }
+            localStorage.setItem('pwaBannerClosed', 'true');
+        }
+
+        function installAppFromBanner() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('App installée depuis la bannière');
+                        closeInstallBanner();
+                    }
+                    deferredPrompt = null;
+                });
+            } else {
+                // Fallback: montrer des instructions
+                alert('Pour installer:\n1. Chrome/Edge: Menu (⋮) → Installer Juif Mobile Pay\n2. Safari iOS: Partager (↑) → Sur l\'écran d\'accueil\n3. Chrome Android: Menu → Ajouter à l\'écran d\'accueil');
+            }
+        }
+
+        // Afficher la bannière après 3 secondes si l'app n'est pas installée
+        setTimeout(() => {
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+            const bannerClosed = localStorage.getItem('pwaBannerClosed');
+
+            if (!isStandalone && bannerClosed !== 'true') {
+                createInstallBanner();
+            }
+        }, 3000);
     </script>
 </body>
 </html>
