@@ -79,7 +79,7 @@ function checkApiKey(req, res, next) {
     const apiKey = req.headers['x-api-key'];
     
     // Routes publiques (pas besoin de clé API)
-    const publicRoutes = ['/api/generate_key', '/api/verify_key'];
+    const publicRoutes = ['/generate_key', '/verify_key'];
     if (publicRoutes.some(route => req.path.startsWith(route))) {
         return next();
     }
