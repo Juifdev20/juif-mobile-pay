@@ -1,0 +1,25 @@
+{
+  "name": "mobile-payment-api",
+  "version": "1.0.0",
+  "description": "Simulateur d'API de paiement mobile pour M-Pesa, Airtel Money et Orange Money en RDC",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "payment",
+    "mobile",
+    "mpesa",
+    "airtel",
+    "orange",
+    "rdc",
+    "congo"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  }
+}

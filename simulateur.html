@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#16213e">
+    <meta name="description" content="Simulateur professionnel de paiement mobile (M-Pesa, Airtel Money, Orange Money) - Par Dieudonne Merci Jean">
+    <title>Mobile Payment Simulator | Dieudonne Merci Jean</title>
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" href="/icon-192.png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --accent: #e94560;
+            --success: #4CAF50;
+            --warning: #FFC107;
+            --danger: #f44336;
+            --dark: #1a1a2e;
+            --darker: #0f0f1a;
+            --light: #f8f9fa;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-dark: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--gradient-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 50%, rgba(118, 75, 162, 0.1) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+            50% { transform: translate(-50%, -50%) rotate(180deg); }
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: var(--gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .logo-text {
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .logo-text span {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        /* Phone Simulator */
+        .phone-section {
+            display: flex;
+            justify-content: center;
+        }
+
+        .phone-container {
+            width: 100%;
+            max-width: 400px;
+            background: linear-gradient(145deg, #2a2a4a, #1a1a2e);
+            border-radius: 40px;
+            padding: 15px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5),
+                        0 0 0 2px rgba(255, 255, 255, 0.1);
+            animation: phoneFloat 6s ease-in-out infinite;
+        }
+
+        @keyframes phoneFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .phone-screen {
+            background: linear-gradient(180deg, #16213e 0%, #0f0f1a 100%);
+            border-radius: 30px;
+            padding: 25px;
+            min-height: 600px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phone-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 30px;
+            background: #000;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .phone-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-top: 15px;
+        }
+
+        .phone-status {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .status-bar {
+            width: 3px;
+            height: 15px;
+            background: var(--success);
+            border-radius: 2px;
+        }
+
+        .phone-time {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .service-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+
+        .service-btn {
+            flex: 1;
+            padding: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .service-btn:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .service-btn.active {
+            border-color: transparent;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .service-btn.mpesa.active {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        }
+
+        .service-btn.airtel.active {
+            background: linear-gradient(135deg, #FF5722 0%, #f44336 100%);
+        }
+
+        .service-btn.orange.active {
+            background: linear-gradient(135deg, #FF9800 0%, #f57c00 100%);
+        }
+
+        .status-display {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .status-display h3 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-display h3 i {
+            color: var(--accent);
+        }
+
+        .transaction-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .transaction-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .transaction-info {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+            line-height: 1.8;
+        }
+
+        .transaction-info strong {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 12px;
+        }
+
+        .status-waiting {
+            background: rgba(255, 193, 7, 0.2);
+            color: #FFC107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+
+        .status-success {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .status-cancelled {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+            border: 1px solid rgba(244, 67, 54, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            padding: 40px 20px;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .refresh-btn {
+            background: var(--gradient);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 15px;
+            width: 100%;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .refresh-btn:active {
+            transform: translateY(0);
+        }
+
+        /* USSD Popup */
+        .ussd-popup {
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            display: none;
+            animation: popupSlide 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .ussd-popup.show {
+            display: block;
+        }
+
+        @keyframes popupSlide {
+            from {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .ussd-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .ussd-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .ussd-popup h3 {
+            color: #1a1a2e;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .ussd-popup p {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .ussd-details {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .ussd-details p {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .ussd-details strong {
+            color: var(--primary);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .accept-btn {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+        }
+
+        .accept-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);
+        }
+
+        .cancel-btn {
+            background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+            color: white;
+        }
+
+        .cancel-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(244, 67, 54, 0.3);
+        }
+
+        /* Info Section */
+        .info-section {
+            color: white;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 25px;
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .info-card h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .info-card p {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 5px;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+            padding: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 10;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .developer-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 15px 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+
+        .developer-info:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .developer-photo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            animation: photoPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes photoPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
+        }
+
+        .developer-details h4 {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .developer-details p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        .developer-details .university {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .copyright {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .phone-section {
+                order: 1;
+            }
+
+            .info-section {
+                order: 2;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 20px;
+            }
+
+            .logo-text {
+                font-size: 1.1rem;
+            }
+
+            .main-content {
+                padding: 30px 15px;
+            }
+
+            .phone-container {
+                max-width: 350px;
+            }
+
+            .phone-screen {
+                padding: 20px;
+                min-height: 550px;
+            }
+
+            .info-card {
+                padding: 20px;
+            }
+
+            .info-card h2 {
+                font-size: 1.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .developer-info {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .phone-container {
+                max-width: 100%;
+            }
+
+            .service-btn {
+                font-size: 0.75rem;
+                padding: 12px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gradient);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-mobile-alt"></i>
+            </div>
+            <div class="logo-text">Juif Mobile <span>Pay</span></div>
+        </div>
+        <div class="header-actions">
+            <a href="/documentation.html" class="action-btn">
+                <i class="fas fa-book"></i> Documentation
+            </a>
+            <button class="action-btn" onclick="refreshData()">
+                <i class="fas fa-sync-alt"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="phone-section">
+                <div class="phone-container">
+                    <div class="phone-screen">
+                        <div class="phone-notch"></div>
+                        <div class="phone-header">
+                            <div class="phone-status">
+                                <div class="status-bar"></div>
+                                <div class="status-bar"></div>
+                                <div class="status-bar"></div>
+                            </div>
+                            <div class="phone-time" id="phone-time">--:--</div>
+                        </div>
+
+                        <div class="service-selector">
+                            <button class="service-btn mpesa active" onclick="selectService('mpesa')">
+                                <i class="fas fa-mobile-alt"></i> M-Pesa
+                            </button>
+                            <button class="service-btn airtel" onclick="selectService('airtel')">
+                                <i class="fas fa-mobile-alt"></i> Airtel
+                            </button>
+                            <button class="service-btn orange" onclick="selectService('orange')">
+                                <i class="fas fa-mobile-alt"></i> Orange
+                            </button>
+                        </div>
+
+                        <div class="status-display">
+                            <h3><i class="fas fa-bell"></i> Transactions</h3>
+                            <div class="transaction-list" id="transaction-list">
+                                <div class="empty-state">
+                                    <i class="fas fa-inbox"></i>
+                                    <p>En attente de transaction...</p>
+                                </div>
+                            </div>
+                            <button class="refresh-btn" onclick="checkTransactions()">
+                                <i class="fas fa-sync-alt"></i> Actualiser
+                            </button>
+                        </div>
+
+                        <div class="ussd-popup" id="ussd-popup">
+                            <div class="ussd-header">
+                                <div class="ussd-icon">
+                                    <i class="fas fa-bell"></i>
+                                </div>
+                                <h3>Notification USSD</h3>
+                            </div>
+                            <p id="ussd-message">Une nouvelle demande de paiement a été reçue.</p>
+                            <div class="ussd-details" id="ussd-details"></div>
+                            <div class="action-buttons">
+                                <button class="action-btn accept-btn" onclick="updateTransactionStatus('SUCCESS')">
+                                    <i class="fas fa-check"></i> Accepter
+                                </button>
+                                <button class="action-btn cancel-btn" onclick="updateTransactionStatus('CANCELLED')">
+                                    <i class="fas fa-times"></i> Annuler
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <div class="info-card">
+                    <h2><i class="fas fa-info-circle"></i> À Propos</h2>
+                    <p>Simulateur professionnel de paiement mobile pour la République Démocratique du Congo. Permet de tester les flux de paiement M-Pesa, Airtel Money et Orange Money en environnement de développement.</p>
+                    <p>Ce simulateur est conçu pour faciliter l'intégration des paiements mobiles dans vos applications web et mobiles.</p>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-icon" style="color: #4CAF50;">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-value" id="success-count">0</div>
+                            <div class="stat-label">Réussies</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon" style="color: #FFC107;">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="stat-value" id="waiting-count">0</div>
+                            <div class="stat-label">En attente</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon" style="color: #f44336;">
+                                <i class="fas fa-times-circle"></i>
+                            </div>
+                            <div class="stat-value" id="cancelled-count">0</div>
+                            <div class="stat-label">Annulées</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon" style="color: var(--accent);">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="stat-value" id="total-count">0</div>
+                            <div class="stat-label">Total</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <h2><i class="fas fa-cog"></i> Services Supportés</h2>
+                    <p><strong style="color: #4CAF50;">M-Pesa</strong> - Service de paiement mobile de Vodacom</p>
+                    <p><strong style="color: #FF5722;">Airtel Money</strong> - Service de paiement mobile d'Airtel</p>
+                    <p><strong style="color: #FF9800;">Orange Money</strong> - Service de paiement mobile d'Orange</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="developer-info">
+                <div class="developer-photo" style="background-image: url('/photo-dieudonne.jpg'); background-size: cover; background-position: center;">
+                </div>
+                <div class="developer-details">
+                    <h4>DIEUDONNE MERCI JEAN</h4>
+                    <p>Étudiant en Informatique de Gestion L3</p>
+                    <p class="university">UCBC - Université Chrétienne Bilingue du Congo</p>
+                </div>
+            </div>
+            <div class="copyright">
+                © 2026 Mobile Payment Simulator By DIEUDONNE MERCI JEAN | Tous droits réservés
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const API_BASE = window.location.origin + '/api';
+        let currentService = 'mpesa';
+        let currentTransaction = null;
+        let checkInterval = null;
+
+        
+        
+        
+        // Mettre à jour l'heure
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('phone-time').textContent = 
+                now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+        }
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // Sélectionner le service
+        function selectService(service) {
+            currentService = service;
+            document.querySelectorAll('.service-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.service-btn.${service}`).classList.add('active');
+            checkTransactions();
+        }
+
+        // Rafraîchir les données
+        function refreshData() {
+            checkTransactions();
+            const btn = event.target.closest('.action-btn');
+            if (btn) {
+                btn.querySelector('i').style.animation = 'spin 0.5s linear';
+                setTimeout(() => {
+                    btn.querySelector('i').style.animation = '';
+                }, 500);
+            }
+        }
+
+        // Vérifier les transactions
+        async function checkTransactions() {
+            try {
+                const response = await fetch(`${API_BASE}/check_request/all`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayTransactions(data.transactions);
+                    updateStats(data.transactions);
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+
+        // Afficher les transactions
+        function displayTransactions(transactions) {
+            const container = document.getElementById('transaction-list');
+            
+            const filtered = transactions.filter(t => 
+                t.service === currentService && t.status === 'waiting'
+            );
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>En attente de transaction...</p>
+                    </div>
+                `;
+                document.getElementById('ussd-popup').classList.remove('show');
+                return;
+            }
+
+            const latest = filtered[filtered.length - 1];
+            currentTransaction = latest;
+
+            container.innerHTML = `
+                <div class="transaction-item">
+                    <div class="transaction-info">
+                        <p><strong>Référence:</strong> ${latest.reference}</p>
+                        <p><strong>Montant:</strong> ${latest.amount.toLocaleString('fr-FR')} FC</p>
+                        <p><strong>Téléphone:</strong> ${latest.phone}</p>
+                        <p><strong>Service:</strong> ${latest.service.toUpperCase()}</p>
+                        <span class="status-badge status-waiting">En attente</span>
+                    </div>
+                </div>
+            `;
+
+            showUSSDPopup(latest);
+        }
+
+        // Afficher le popup USSD
+        function showUSSDPopup(transaction) {
+            const popup = document.getElementById('ussd-popup');
+            const message = document.getElementById('ussd-message');
+            const details = document.getElementById('ussd-details');
+
+            message.textContent = `Demande de paiement ${transaction.service.toUpperCase()}`;
+            details.innerHTML = `
+                <p><strong>Montant:</strong> ${transaction.amount.toLocaleString('fr-FR')} FC</p>
+                <p><strong>De:</strong> ${transaction.phone}</p>
+                <p><strong>Référence:</strong> ${transaction.reference}</p>
+                <p><strong>Date:</strong> ${new Date(transaction.created_at).toLocaleString('fr-FR')}</p>
+            `;
+
+            popup.classList.add('show');
+        }
+
+        // Mettre à jour le statut
+        async function updateTransactionStatus(status) {
+            if (!currentTransaction) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/update_status`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        reference: currentTransaction.reference,
+                        status: status
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('ussd-popup').classList.remove('show');
+                    
+                    if (status === 'SUCCESS') {
+                        showNotification('Paiement Accepté', 'La transaction a été confirmée avec succès');
+                    } else {
+                        showNotification('Paiement Annulé', 'La transaction a été annulée');
+                    }
+                    
+                    checkTransactions();
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showNotification('Erreur', 'Impossible de mettre à jour la transaction');
+            }
+        }
+
+        // Mettre à jour les statistiques
+        function updateStats(transactions) {
+            const success = transactions.filter(t => t.status === 'SUCCESS').length;
+            const waiting = transactions.filter(t => t.status === 'waiting').length;
+            const cancelled = transactions.filter(t => t.status === 'CANCELLED').length;
+            const total = transactions.length;
+
+            document.getElementById('success-count').textContent = success;
+            document.getElementById('waiting-count').textContent = waiting;
+            document.getElementById('cancelled-count').textContent = cancelled;
+            document.getElementById('total-count').textContent = total;
+        }
+
+        // Notification (si supportée)
+        function showNotification(title, body) {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification(title, { body, icon: '/icon-192.png' });
+            }
+        }
+
+        // Demander la permission de notification
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
+
+        // Démarrer le polling
+        function startPolling() {
+            checkTransactions();
+            checkInterval = setInterval(checkTransactions, 2000);
+        }
+
+        // Démarrer au chargement
+        startPolling();
+
+        // Ajouter l'animation spin
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

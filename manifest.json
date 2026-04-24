@@ -1,0 +1,13 @@
+{
+  "name": "Mobile Payment Simulator",
+  "short_name": "Payment Sim",
+  "description": "Simulateur professionnel de paiement mobile (M-Pesa, Airtel Money, Orange Money)",
+  "start_url": "/simulateur.html",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#16213e",
+  "orientation": "portrait",
+  "screenshots": [],
+  "categories": ["finance", "business"],
+  "lang": "fr"
+}

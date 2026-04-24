@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Documentation API Juif Mobile Pay - Simulateur de paiement mobile (M-Pesa, Airtel Money, Orange Money)">
+    <title>API Documentation | Juif Mobile Pay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #16213e;
+            --secondary: #1a1a2e;
+            --accent: #ffd700;
+            --success: #4CAF50;
+            --error: #f44336;
+            --warning: #ff9800;
+            --info: #2196F3;
+            --text: #ffffff;
+            --text-secondary: #b0b0b0;
+            --border: #333;
+            --code-bg: #282c34;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(22, 33, 62, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--accent), #ffed4e);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--primary);
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .logo-text span {
+            color: var(--accent);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 215, 0, 0.1);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent);
+            color: var(--primary);
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        .hero h1 span {
+            color: var(--accent);
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--success);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        /* Sections */
+        .section {
+            background: rgba(26, 26, 46, 0.8);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--accent);
+        }
+
+        /* Endpoint Cards */
+        .endpoint {
+            background: rgba(22, 33, 62, 0.6);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .endpoint-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .method {
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        .method-post {
+            background: var(--success);
+            color: white;
+        }
+
+        .method-get {
+            background: var(--info);
+            color: white;
+        }
+
+        .method-delete {
+            background: var(--error);
+            color: white;
+        }
+
+        .endpoint-url {
+            font-family: 'Courier New', monospace;
+            background: var(--code-bg);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            color: var(--accent);
+        }
+
+        .endpoint-description {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        /* Parameters Table */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: rgba(255, 215, 0, 0.1);
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .required {
+            color: var(--error);
+            font-weight: 600;
+        }
+
+        .optional {
+            color: var(--text-secondary);
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: var(--code-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .code-block pre {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .code-title {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent);
+            color: var(--primary);
+            border-color: var(--accent);
+        }
+
+        /* Response Codes */
+        .response-code {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 13px;
+            margin-right: 10px;
+        }
+
+        .response-200 {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--success);
+        }
+
+        .response-400 {
+            background: rgba(255, 152, 0, 0.2);
+            color: var(--warning);
+        }
+
+        .response-404 {
+            background: rgba(244, 67, 54, 0.2);
+            color: var(--error);
+        }
+
+        /* Contact Section */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .contact-card {
+            background: rgba(22, 33, 62, 0.6);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+        }
+
+        .contact-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--accent), #ffed4e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--primary);
+            margin: 0 auto 15px;
+        }
+
+        .contact-card h4 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .contact-card p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(22, 33, 62, 0.95);
+            padding: 30px 20px;
+            border-top: 1px solid var(--border);
+            margin-top: 50px;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .developer-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .developer-photo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-image: url('/photo-dieudonne.jpg');
+            background-size: cover;
+            background-position: center;
+            border: 2px solid var(--accent);
+        }
+
+        .developer-details h4 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .developer-details p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .copyright {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .endpoint-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .developer-info {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div class="logo-text">Juif Mobile <span>Pay</span></div>
+                </div>
+                <div class="header-actions">
+                    <a href="/simulateur.html" class="btn btn-secondary">
+                        <i class="fas fa-flask"></i> Simulateur
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <div class="hero-badge">
+                <i class="fas fa-check-circle"></i> API v1.0
+            </div>
+            <h1>API <span>Documentation</span></h1>
+            <p>Intégrez facilement les paiements mobiles (M-Pesa, Airtel Money, Orange Money) dans vos applications avec notre API REST simple et puissante.</p>
+        </div>
+
+        <!-- Base URL -->
+        <div class="section">
+            <h2 class="section-title">
+                <i class="fas fa-server"></i> URL de Base
+            </h2>
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">Base URL</span>
+                </div>
+                <pre><code class="language-bash">https://votre-domaine.com/api</code></pre>
+            </div>
+            <p style="color: var(--text-secondary);">Remplacez <code>votre-domaine.com</code> par votre domaine ou utilisez <code>http://localhost:3000/api</code> en développement local.</p>
+        </div>
+
+        <!-- Authentication -->
+        <div class="section">
+            <h2 class="section-title">
+                <i class="fas fa-lock"></i> Authentification
+            </h2>
+            <p style="color: var(--text-secondary); margin-bottom: 15px;">
+                Cette API est actuellement en mode développement et ne nécessite pas d'authentification. En production, nous recommandons d'ajouter une authentification par clé API ou JWT.
+            </p>
+        </div>
+
+        <!-- Endpoints -->
+        <div class="section">
+            <h2 class="section-title">
+                <i class="fas fa-plug"></i> Endpoints
+            </h2>
+
+            <!-- Initiate Payment -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method method-post">POST</span>
+                    <span class="endpoint-url">/api/initiate_pay</span>
+                </div>
+                <p class="endpoint-description">Initialise une nouvelle transaction de paiement mobile.</p>
+                
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Paramètres du Corps (JSON)</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Paramètre</th>
+                                <th>Type</th>
+                                <th>Requis</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>amount</td>
+                                <td>number</td>
+                                <td class="required">Oui</td>
+                                <td>Montant du paiement en FC</td>
+                            </tr>
+                            <tr>
+                                <td>phone</td>
+                                <td>string</td>
+                                <td class="required">Oui</td>
+                                <td>Numéro de téléphone du client (10 chiffres minimum)</td>
+                            </tr>
+                            <tr>
+                                <td>service</td>
+                                <td>string</td>
+                                <td class="required">Oui</td>
+                                <td>Service de paiement: <code>mpesa</code>, <code>airtel</code>, ou <code>orange</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Exemple de Requête</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-title">cURL</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    </div>
+                    <pre><code class="language-bash">curl -X POST https://votre-domaine.com/api/initiate_pay \
+  -H "Content-Type: application/json" \
+  -d '{
+    "amount": 50000,
+    "phone": "0828497218",
+    "service": "mpesa"
+  }'</code></pre>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-title">JavaScript (fetch)</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    </div>
+                    <pre><code class="language-javascript">const response = await fetch('https://votre-domaine.com/api/initiate_pay', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    amount: 50000,
+    phone: '0828497218',
+    service: 'mpesa'
+  })
+});
+
+const data = await response.json();
+console.log(data);</code></pre>
+                </div>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Réponse Succès (200)</h3>
+                <div class="code-block">
+                    <pre><code class="language-json">{
+  "success": true,
+  "reference": "MPESA_20260424104100_f6k6n1mv",
+  "message": "Transaction initiée avec succès",
+  "transaction": {
+    "reference": "MPESA_20260424104100_f6k6n1mv",
+    "amount": 50000,
+    "phone": "0828497218",
+    "service": "mpesa",
+    "status": "waiting",
+    "created_at": "2026-04-24T10:41:00.513Z",
+    "updated_at": "2026-04-24T10:41:00.513Z"
+  }
+}</code></pre>
+                </div>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Codes de Réponse</h3>
+                <div>
+                    <span class="response-code response-200">200</span> Succès
+                    <span class="response-code response-400">400</span> Paramètres invalides
+                </div>
+            </div>
+
+            <!-- Check Status -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method method-get">GET</span>
+                    <span class="endpoint-url">/api/check_request</span>
+                </div>
+                <p class="endpoint-description">Vérifie le statut d'une transaction existante.</p>
+                
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Paramètres de Requête</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Paramètre</th>
+                                <th>Type</th>
+                                <th>Requis</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>reference</td>
+                                <td>string</td>
+                                <td class="required">Oui</td>
+                                <td>Référence de la transaction retournée lors de l'initialisation</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Exemple de Requête</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-title">cURL</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    </div>
+                    <pre><code class="language-bash">curl -X GET "https://votre-domaine.com/api/check_request?reference=MPESA_20260424104100_f6k6n1mv"</code></pre>
+                </div>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Réponse Succès (200)</h3>
+                <div class="code-block">
+                    <pre><code class="language-json">{
+  "success": true,
+  "transaction": {
+    "reference": "MPESA_20260424104100_f6k6n1mv",
+    "amount": 50000,
+    "phone": "0828497218",
+    "service": "mpesa",
+    "status": "SUCCESS",
+    "created_at": "2026-04-24T10:41:00.513Z",
+    "updated_at": "2026-04-24T10:41:14.982Z"
+  },
+  "status": "SUCCESS"
+}</code></pre>
+                </div>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Statuts Possibles</h3>
+                <ul style="margin-left: 20px; color: var(--text-secondary);">
+                    <li><code style="color: var(--warning);">waiting</code> - En attente de confirmation du client</li>
+                    <li><code style="color: var(--success);">SUCCESS</code> - Paiement réussi</li>
+                    <li><code style="color: var(--error);">CANCELLED</code> - Paiement annulé par le client</li>
+                </ul>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Codes de Réponse</h3>
+                <div>
+                    <span class="response-code response-200">200</span> Succès
+                    <span class="response-code response-400">400</span> Paramètre manquant
+                    <span class="response-code response-404">404</span> Transaction non trouvée
+                </div>
+            </div>
+
+            <!-- Update Status -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method method-post">POST</span>
+                    <span class="endpoint-url">/api/update_status</span>
+                </div>
+                <p class="endpoint-description">Met à jour le statut d'une transaction (utilisé par le simulateur).</p>
+                
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Paramètres du Corps (JSON)</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Paramètre</th>
+                                <th>Type</th>
+                                <th>Requis</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>reference</td>
+                                <td>string</td>
+                                <td class="required">Oui</td>
+                                <td>Référence de la transaction</td>
+                            </tr>
+                            <tr>
+                                <td>status</td>
+                                <td>string</td>
+                                <td class="required">Oui</td>
+                                <td>Nouveau statut: <code>SUCCESS</code> ou <code>CANCELLED</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Exemple de Requête</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-title">cURL</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    </div>
+                    <pre><code class="language-bash">curl -X POST https://votre-domaine.com/api/update_status \
+  -H "Content-Type: application/json" \
+  -d '{
+    "reference": "MPESA_20260424104100_f6k6n1mv",
+    "status": "SUCCESS"
+  }'</code></pre>
+                </div>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Réponse Succès (200)</h3>
+                <div class="code-block">
+                    <pre><code class="language-json">{
+  "success": true,
+  "message": "Statut mis à jour avec succès",
+  "reference": "MPESA_20260424104100_f6k6n1mv",
+  "status": "SUCCESS"
+}</code></pre>
+                </div>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Codes de Réponse</h3>
+                <div>
+                    <span class="response-code response-200">200</span> Succès
+                    <span class="response-code response-400">400</span> Paramètres invalides
+                    <span class="response-code response-404">404</span> Transaction non trouvée
+                </div>
+            </div>
+
+            <!-- Get All Transactions -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method method-get">GET</span>
+                    <span class="endpoint-url">/api/transactions</span>
+                </div>
+                <p class="endpoint-description">Récupère toutes les transactions enregistrées.</p>
+                
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Exemple de Requête</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-title">cURL</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    </div>
+                    <pre><code class="language-bash">curl -X GET https://votre-domaine.com/api/transactions</code></pre>
+                </div>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Réponse Succès (200)</h3>
+                <div class="code-block">
+                    <pre><code class="language-json">{
+  "success": true,
+  "transactions": [
+    {
+      "reference": "MPESA_20260424104100_f6k6n1mv",
+      "amount": 50000,
+      "phone": "0828497218",
+      "service": "mpesa",
+      "status": "SUCCESS",
+      "created_at": "2026-04-24T10:41:00.513Z",
+      "updated_at": "2026-04-24T10:41:14.982Z"
+    }
+  ]
+}</code></pre>
+                </div>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Codes de Réponse</h3>
+                <div>
+                    <span class="response-code response-200">200</span> Succès
+                </div>
+            </div>
+
+            <!-- Delete Transactions -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method method-delete">DELETE</span>
+                    <span class="endpoint-url">/api/transactions</span>
+                </div>
+                <p class="endpoint-description">Supprime toutes les transactions (reset de la base de données).</p>
+                
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Exemple de Requête</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-title">cURL</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    </div>
+                    <pre><code class="language-bash">curl -X DELETE https://votre-domaine.com/api/transactions</code></pre>
+                </div>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Réponse Succès (200)</h3>
+                <div class="code-block">
+                    <pre><code class="language-json">{
+  "success": true,
+  "message": "Transactions réinitialisées"
+}</code></pre>
+                </div>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Codes de Réponse</h3>
+                <div>
+                    <span class="response-code response-200">200</span> Succès
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Section -->
+        <div class="section">
+            <h2 class="section-title">
+                <i class="fas fa-envelope"></i> Contact & Support
+            </h2>
+            <div class="contact-grid">
+                <div class="contact-card">
+                    <div class="contact-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h4>Développeur</h4>
+                    <p>DIEUDONNE MERCI JEAN</p>
+                    <p>Étudiant en Informatique de Gestion L3</p>
+                </div>
+                <div class="contact-card">
+                    <div class="contact-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <h4>Téléphone</h4>
+                    <p>+243 828 497 218</p>
+                </div>
+                <div class="contact-card">
+                    <div class="contact-icon">
+                        <i class="fas fa-university"></i>
+                    </div>
+                    <h4>Université</h4>
+                    <p>UCBC</p>
+                    <p>Université Chrétienne Bilingue du Congo</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rate Limits -->
+        <div class="section">
+            <h2 class="section-title">
+                <i class="fas fa-tachometer-alt"></i> Limites de Taux
+            </h2>
+            <p style="color: var(--text-secondary);">
+                Actuellement, aucune limite de taux n'est appliquée. En production, nous recommandons d'implémenter des limites pour prévenir les abus.
+            </p>
+        </div>
+
+        <!-- Errors -->
+        <div class="section">
+            <h2 class="section-title">
+                <i class="fas fa-exclamation-triangle"></i> Gestion des Erreurs
+            </h2>
+            <p style="color: var(--text-secondary); margin-bottom: 15px;">
+                Toutes les erreurs retournent un objet JSON avec le format suivant :
+            </p>
+            <div class="code-block">
+                <pre><code class="language-json">{
+  "success": false,
+  "message": "Description de l'erreur"
+}</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="developer-info">
+                    <div class="developer-photo"></div>
+                    <div class="developer-details">
+                        <h4>DIEUDONNE MERCI JEAN</h4>
+                        <p>Étudiant en Informatique de Gestion L3</p>
+                        <p>UCBC - Université Chrétienne Bilingue du Congo</p>
+                    </div>
+                </div>
+                <div class="copyright">
+                    © 2026 Juif Mobile Pay API Documentation | Tous droits réservés
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize syntax highlighting
+        document.addEventListener('DOMContentLoaded', function() {
+            hljs.highlightAll();
+        });
+
+        // Copy code function
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block').querySelector('code');
+            const text = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copié!';
+                button.style.background = 'var(--success)';
+                button.style.color = 'white';
+                button.style.borderColor = 'var(--success)';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = 'transparent';
+                    button.style.color = 'var(--text-secondary)';
+                    button.style.borderColor = 'var(--border)';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
