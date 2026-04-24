@@ -69,6 +69,14 @@ function generateApiKey() {
     return 'JUIFMOBILEPAYAPI_' + randomPart;
 }
 
+// Clé admin statique (en production, utiliser une variable d'environnement)
+const ADMIN_API_KEY = process.env.ADMIN_API_KEY || 'JUIFMOBILEPAYADMIN_super_secret_key_2024';
+
+// Helper: Vérifier si c'est une clé admin
+function isAdminApiKey(apiKey) {
+    return apiKey === ADMIN_API_KEY;
+}
+
 // Helper: Vérifier la clé API
 function isValidApiKey(apiKey) {
     const apiKeys = loadApiKeys();
@@ -393,6 +401,90 @@ app.delete('/api/transactions', (req, res) => {
     res.json({
         success: true,
         message: 'Transactions réinitialisées pour cette clé API'
+    });
+});
+
+/**
+ * GET /api/admin/stats
+ * Récupère les statistiques admin (nécessite clé admin)
+ */
+app.get('/api/admin/stats', (req, res) => {
+    const apiKey = req.headers['x-api-key'];
+    
+    if (!isAdminApiKey(apiKey)) {
+        return res.status(403).json({
+            success: false,
+            message: 'Accès refusé. Clé admin requise.'
+        });
+    }
+    
+    const apiKeys = loadApiKeys();
+    const transactions = loadTransactions();
+    
+    // Calculer les statistiques
+    const totalUsers = apiKeys.length;
+    const activeUsers = apiKeys.filter(k => k.active).length;
+    const inactiveUsers = totalUsers - activeUsers;
+    
+    // Calculer les transactions par utilisateur
+    const userStats = apiKeys.map(key => {
+        const userTransactions = transactions.filter(t => t.api_key === key.key);
+        return {
+            name: key.name,
+            email: key.email,
+            apiKey: key.key,
+            active: key.active,
+            createdAt: key.created_at,
+            totalTransactions: userTransactions.length,
+            successfulTransactions: userTransactions.filter(t => t.status === 'SUCCESS').length,
+            failedTransactions: userTransactions.filter(t => t.status === 'FAILED').length,
+            pendingTransactions: userTransactions.filter(t => t.status === 'PENDING').length
+        };
+    });
+    
+    res.json({
+        success: true,
+        stats: {
+            totalUsers,
+            activeUsers,
+            inactiveUsers,
+            totalTransactions: transactions.length,
+            users: userStats
+        }
+    });
+});
+
+/**
+ * DELETE /api/admin/api_keys/:key
+ * Désactive une clé API (nécessite clé admin)
+ */
+app.delete('/api/admin/api_keys/:key', (req, res) => {
+    const apiKey = req.headers['x-api-key'];
+    const keyToDisable = req.params.key;
+    
+    if (!isAdminApiKey(apiKey)) {
+        return res.status(403).json({
+            success: false,
+            message: 'Accès refusé. Clé admin requise.'
+        });
+    }
+    
+    const apiKeys = loadApiKeys();
+    const keyIndex = apiKeys.findIndex(k => k.key === keyToDisable);
+    
+    if (keyIndex === -1) {
+        return res.status(404).json({
+            success: false,
+            message: 'Clé API non trouvée'
+        });
+    }
+    
+    apiKeys[keyIndex].active = false;
+    saveApiKeys(apiKeys);
+    
+    res.json({
+        success: true,
+        message: 'Clé API désactivée'
     });
 });
 

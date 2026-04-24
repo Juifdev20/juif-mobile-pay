@@ -712,7 +712,15 @@
             font-size: 1.5rem;
             color: white;
             border: 3px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s;
             animation: photoPulse 3s ease-in-out infinite;
+        }
+
+        .developer-photo:hover {
+            border-color: var(--accent);
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
         }
 
         @keyframes photoPulse {
@@ -1111,6 +1119,344 @@
             width: 100%;
             justify-content: center;
         }
+
+        .admin-dashboard-content {
+            width: 95%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .admin-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+        }
+
+        .admin-header-left {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+        }
+
+        .admin-header-right {
+            justify-content: flex-end;
+        }
+
+        .back-to-simulator {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .admin-stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .section-header {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 10px;
+        }
+
+        .refresh-btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        #admin-users-table {
+            font-size: 11px;
+        }
+
+        #admin-users-table th,
+        #admin-users-table td {
+            padding: 10px 8px;
+        }
+
+        .api-key-cell {
+            font-size: 9px !important;
+            max-width: 100px !important;
+        }
+
+        .stat-value {
+            font-size: 28px;
+        }
+
+        .change-password-section {
+            padding: 20px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .admin-dashboard-content {
+            max-width: 95%;
+        }
+
+        .admin-stat-card {
+            padding: 15px;
+        }
+
+        .stat-icon {
+            width: 45px;
+            height: 45px;
+            font-size: 22px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+        }
+    }
+
+    /* Admin Dashboard Styles */
+    .admin-dashboard-content {
+        max-width: 1000px;
+        max-height: 95vh;
+        overflow-y: auto;
+    }
+
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .admin-header-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .admin-badge {
+        background: linear-gradient(135deg, var(--accent) 0%, #ffaa00 100%);
+        color: var(--primary);
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .admin-header-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .back-to-simulator {
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid var(--accent);
+        color: var(--accent);
+        padding: 8px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 13px;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .back-to-simulator:hover {
+        background: var(--accent);
+        color: var(--primary);
+        transform: translateX(-3px);
+    }
+
+    .admin-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .admin-stat-card {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s;
+    }
+
+    .admin-stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .admin-stat-card.success {
+        border-color: rgba(76, 175, 80, 0.5);
+        background: rgba(76, 175, 80, 0.15);
+    }
+
+    .admin-stat-card.error {
+        border-color: rgba(244, 67, 54, 0.5);
+        background: rgba(244, 67, 54, 0.15);
+    }
+
+    .stat-icon {
+        width: 55px;
+        height: 55px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        background: rgba(255, 215, 0, 0.2);
+        color: var(--accent);
+        flex-shrink: 0;
+    }
+
+    .admin-stat-card.success .stat-icon {
+        background: rgba(76, 175, 80, 0.2);
+        color: var(--success);
+    }
+
+    .admin-stat-card.error .stat-icon {
+        background: rgba(244, 67, 54, 0.2);
+        color: var(--error);
+    }
+
+    .stat-info {
+        flex: 1;
+    }
+
+    .stat-value {
+        font-size: 32px;
+        font-weight: 800;
+        color: var(--text);
+        margin-bottom: 5px;
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 11px;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+    }
+
+    .admin-users-section {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 25px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .section-header h4 {
+        color: var(--accent);
+        font-size: 20px;
+        margin: 0;
+        font-weight: 700;
+    }
+
+    .refresh-btn {
+        background: linear-gradient(135deg, var(--accent) 0%, #ffaa00 100%);
+        color: var(--primary);
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 13px;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .refresh-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+    }
+
+    .table-container {
+        overflow-x: auto;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    #admin-users-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    #admin-users-table th {
+        background: rgba(255, 215, 0, 0.1);
+        color: var(--accent);
+        font-weight: 700;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 15px;
+        text-align: left;
+    }
+
+    #admin-users-table td {
+        padding: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        font-size: 13px;
+    }
+
+    #admin-users-table tr:hover {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-badge.active {
+        background: rgba(76, 175, 80, 0.2);
+        color: var(--success);
+        border: 1px solid rgba(76, 175, 80, 0.3);
+    }
+
+    .status-badge.inactive {
+        background: rgba(244, 67, 54, 0.2);
+        color: var(--error);
+        border: 1px solid rgba(244, 67, 54, 0.3);
+    }
+
+    .change-password-section {
+        background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 170, 0, 0.05) 100%);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 25px;
+        border: 2px solid var(--accent);
+        box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
+    }
+
+    .change-password-section h4 {
+        color: var(--accent);
+        margin-bottom: 20px;
+        font-size: 18px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
     </style>
 </head>
@@ -1149,6 +1495,127 @@
                         </button>
                     </div>
                     <p class="info-message"><i class="fas fa-info-circle"></i> Votre clé API a été automatiquement sauvegardée.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Connexion Admin -->
+    <div id="admin-login-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-shield-alt"></i> Connexion Admin</h3>
+                <button class="modal-close" onclick="closeAdminLoginModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="admin-password">Mot de passe admin</label>
+                    <input type="password" id="admin-password" placeholder="Entrez votre mot de passe" autocomplete="off">
+                </div>
+                <button class="btn-generate" onclick="adminLogin()">
+                    <i class="fas fa-sign-in-alt"></i> Connexion
+                </button>
+                <div id="admin-login-error" class="error-message" style="display: none; color: var(--error); margin-top: 10px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Dashboard Admin -->
+    <div id="admin-dashboard-modal" class="modal">
+        <div class="modal-content admin-dashboard-content">
+            <div class="modal-header admin-header">
+                <div class="admin-header-left">
+                    <h3><i class="fas fa-chart-line"></i> Dashboard Admin</h3>
+                    <span class="admin-badge"><i class="fas fa-crown"></i> Super Admin</span>
+                </div>
+                <div class="admin-header-right">
+                    <button class="back-to-simulator" onclick="closeAdminDashboard()">
+                        <i class="fas fa-arrow-left"></i> Retour
+                    </button>
+                    <button class="modal-close" onclick="closeAdminDashboard()">&times;</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <!-- Stats Cards -->
+                <div class="admin-stats-grid">
+                    <div class="admin-stat-card">
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="admin-total-users">0</div>
+                            <div class="stat-label">Total Utilisateurs</div>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card success">
+                        <div class="stat-icon"><i class="fas fa-user-check"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="admin-active-users">0</div>
+                            <div class="stat-label">Actifs</div>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card error">
+                        <div class="stat-icon"><i class="fas fa-user-times"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="admin-inactive-users">0</div>
+                            <div class="stat-label">Inactifs</div>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <div class="stat-icon"><i class="fas fa-exchange-alt"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="admin-total-transactions">0</div>
+                            <div class="stat-label">Transactions</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users Table -->
+                <div class="admin-users-section">
+                    <div class="section-header">
+                        <h4><i class="fas fa-list"></i> Utilisateurs</h4>
+                        <button class="refresh-btn" onclick="loadAdminStats()">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                    <div id="admin-loading" class="loading" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>Chargement...</p>
+                    </div>
+                    <div class="table-container">
+                        <table id="admin-users-table">
+                            <thead>
+                                <tr>
+                                    <th>Nom</th>
+                                    <th>Email</th>
+                                    <th>Clé API</th>
+                                    <th>Statut</th>
+                                    <th>Transactions</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-users-tbody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Change Password Section -->
+                <div class="change-password-section">
+                    <h4><i class="fas fa-key"></i> Changer le mot de passe admin</h4>
+                    <div class="form-group">
+                        <label for="current-password">Mot de passe actuel</label>
+                        <input type="password" id="current-password" placeholder="Mot de passe actuel">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-password">Nouveau mot de passe</label>
+                        <input type="password" id="new-password" placeholder="Nouveau mot de passe">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-password">Confirmer le mot de passe</label>
+                        <input type="password" id="confirm-password" placeholder="Confirmer">
+                    </div>
+                    <button class="btn-generate" onclick="changeAdminPassword()">
+                        <i class="fas fa-key"></i> Changer mot de passe
+                    </button>
                 </div>
             </div>
         </div>
@@ -1304,7 +1771,7 @@
     <footer class="footer">
         <div class="footer-content">
             <div class="developer-info">
-                <div class="developer-photo" style="background-image: url('/photo-dieudonne.jpg'); background-size: cover; background-position: center;">
+                <div class="developer-photo" style="background-image: url('/photo-dieudonne.jpg'); background-size: cover; background-position: center;" onclick="showAdminLoginModal()">
                 </div>
                 <div class="developer-details">
                     <h4>DIEUDONNE MERCI JEAN</h4>
@@ -1325,6 +1792,8 @@
         let checkInterval = null;
         let deferredPrompt = null;
         let apiKey = localStorage.getItem('jpay_api_key') || '';
+        let adminPassword = localStorage.getItem('jpay_admin_password') || 'admin123';
+        let isAdminLoggedIn = false;
 
         // Fonction pour définir la clé API
         function setApiKey(key) {
@@ -1459,6 +1928,171 @@
                 installBtn.style.display = 'block';
             }
         });
+
+        // ==========================================
+        // ADMIN FUNCTIONS
+        // ==========================================
+
+        // Afficher modal connexion admin
+        function showAdminLoginModal() {
+            document.getElementById('admin-login-modal').classList.add('show');
+            document.getElementById('admin-password').value = '';
+            document.getElementById('admin-login-error').style.display = 'none';
+        }
+
+        // Fermer modal connexion admin
+        function closeAdminLoginModal() {
+            document.getElementById('admin-login-modal').classList.remove('show');
+        }
+
+        // Connexion admin
+        function adminLogin() {
+            const password = document.getElementById('admin-password').value;
+            
+            if (password === adminPassword) {
+                isAdminLoggedIn = true;
+                closeAdminLoginModal();
+                showAdminDashboard();
+            } else {
+                document.getElementById('admin-login-error').textContent = 'Mot de passe incorrect';
+                document.getElementById('admin-login-error').style.display = 'block';
+            }
+        }
+
+        // Afficher dashboard admin
+        function showAdminDashboard() {
+            document.getElementById('admin-dashboard-modal').classList.add('show');
+            loadAdminStats();
+        }
+
+        // Fermer dashboard admin
+        function closeAdminDashboard() {
+            document.getElementById('admin-dashboard-modal').classList.remove('show');
+            isAdminLoggedIn = false;
+        }
+
+        // Charger les stats admin
+        async function loadAdminStats() {
+            const loading = document.getElementById('admin-loading');
+            loading.style.display = 'block';
+
+            try {
+                const response = await fetch(`${API_BASE}/admin/stats`, {
+                    headers: {
+                        'x-api-key': 'JUIFMOBILEPAYADMIN_super_secret_key_2024'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayAdminStats(data.stats);
+                } else {
+                    alert('Erreur: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur lors du chargement des statistiques');
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        // Afficher les stats admin
+        function displayAdminStats(stats) {
+            document.getElementById('admin-total-users').textContent = stats.totalUsers;
+            document.getElementById('admin-active-users').textContent = stats.activeUsers;
+            document.getElementById('admin-inactive-users').textContent = stats.inactiveUsers;
+            document.getElementById('admin-total-transactions').textContent = stats.totalTransactions;
+
+            const tbody = document.getElementById('admin-users-tbody');
+            tbody.innerHTML = '';
+
+            stats.users.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td class="api-key-cell" style="font-family: 'Courier New', monospace; font-size: 11px; color: var(--accent); max-width: 150px; word-break: break-all;">${user.apiKey}</td>
+                    <td>
+                        <span class="status-badge ${user.active ? 'active' : 'inactive'}">
+                            ${user.active ? 'Actif' : 'Inactif'}
+                        </span>
+                    </td>
+                    <td>${user.totalTransactions}</td>
+                    <td>
+                        ${user.active ? `<button class="action-btn" onclick="disableUserApiKey('${user.apiKey}')" style="background: rgba(244, 67, 54, 0.2); color: var(--error); border: 1px solid var(--error); padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 11px;">
+                            <i class="fas fa-ban"></i> Désactiver
+                        </button>` : '-'}
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Désactiver une clé API utilisateur
+        async function disableUserApiKey(apiKey) {
+            if (!confirm('Êtes-vous sûr de vouloir désactiver cette clé API ?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/admin/api_keys/${encodeURIComponent(apiKey)}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'x-api-key': 'JUIFMOBILEPAYADMIN_super_secret_key_2024'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('Clé API désactivée avec succès');
+                    loadAdminStats();
+                } else {
+                    alert('Erreur: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur lors de la désactivation de la clé API');
+            }
+        }
+
+        // Changer le mot de passe admin
+        function changeAdminPassword() {
+            const currentPass = document.getElementById('current-password').value;
+            const newPass = document.getElementById('new-password').value;
+            const confirmPass = document.getElementById('confirm-password').value;
+
+            if (!currentPass || !newPass || !confirmPass) {
+                alert('Tous les champs sont requis');
+                return;
+            }
+
+            if (currentPass !== adminPassword) {
+                alert('Mot de passe actuel incorrect');
+                return;
+            }
+
+            if (newPass !== confirmPass) {
+                alert('Les nouveaux mots de passe ne correspondent pas');
+                return;
+            }
+
+            if (newPass.length < 6) {
+                alert('Le mot de passe doit contenir au moins 6 caractères');
+                return;
+            }
+
+            adminPassword = newPass;
+            localStorage.setItem('jpay_admin_password', adminPassword);
+            
+            document.getElementById('current-password').value = '';
+            document.getElementById('new-password').value = '';
+            document.getElementById('confirm-password').value = '';
+
+            alert('Mot de passe admin changé avec succès !');
+        }
 
         function installApp() {
             if (deferredPrompt) {
