@@ -15,9 +15,11 @@ class MobilePayment {
     /**
      * @param {string} apiBaseUrl - URL de base de l'API (ex: http://localhost:3000/mobile-payment-api/api)
      * @param {object} options - Options de configuration
+     * @param {string} options.apiKey - Clé API Juif Mobile Pay
      */
     constructor(apiBaseUrl, options = {}) {
         this.apiBaseUrl = apiBaseUrl.replace(/\/$/, '');
+        this.apiKey = options.apiKey || null;
         this.pollingInterval = options.pollingInterval || 2000; // 2 secondes par défaut
         this.maxPollingAttempts = options.maxPollingAttempts || 60; // 2 minutes max
         this.currentReference = null;
@@ -40,11 +42,18 @@ class MobilePayment {
             }
 
             // Appeler l'API d'initialisation
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            
+            // Ajouter la clé API si disponible
+            if (this.apiKey) {
+                headers['x-api-key'] = this.apiKey;
+            }
+            
             const response = await fetch(`${this.apiBaseUrl}/initiate_pay`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: headers,
                 body: JSON.stringify({
                     amount: amount,
                     phone: phone,
@@ -86,8 +95,16 @@ class MobilePayment {
      */
     async checkStatus(reference) {
         try {
+            const headers = {};
+            
+            // Ajouter la clé API si disponible
+            if (this.apiKey) {
+                headers['x-api-key'] = this.apiKey;
+            }
+            
             const response = await fetch(
-                `${this.apiBaseUrl}/check_request?reference=${reference}`
+                `${this.apiBaseUrl}/check_request?reference=${reference}`,
+                { headers }
             );
             const data = await response.json();
             return data;
