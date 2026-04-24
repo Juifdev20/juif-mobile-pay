@@ -1,5 +1,6 @@
 node_modules/
 transactions.json
+api_keys.json
 .env
 .DS_Store
 *.log

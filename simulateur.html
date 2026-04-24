@@ -761,6 +761,10 @@
             <div class="logo-text">Juif Mobile <span>Pay</span></div>
         </div>
         <div class="header-actions">
+            <input type="text" id="api-key-input" placeholder="Clé API" style="padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: rgba(255,255,255,0.1); color: white; width: 150px; font-size: 14px;">
+            <button class="action-btn" onclick="saveApiKey()" style="padding: 8px 12px; font-size: 12px;">
+                <i class="fas fa-save"></i>
+            </button>
             <button class="action-btn" onclick="installApp()" id="install-btn" style="display: none;">
                 <i class="fas fa-download"></i> Installer
             </button>
@@ -906,6 +910,41 @@
         let currentTransaction = null;
         let checkInterval = null;
         let deferredPrompt = null;
+        let apiKey = localStorage.getItem('jpay_api_key') || '';
+
+        // Fonction pour définir la clé API
+        function setApiKey(key) {
+            apiKey = key;
+            localStorage.setItem('jpay_api_key', key);
+        }
+
+        // Fonction pour obtenir les headers avec la clé API
+        function getHeaders() {
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            if (apiKey) {
+                headers['x-api-key'] = apiKey;
+            }
+            return headers;
+        }
+
+        // Sauvegarder la clé API
+        function saveApiKey() {
+            const input = document.getElementById('api-key-input');
+            if (input.value) {
+                setApiKey(input.value);
+                alert('Clé API sauvegardée !');
+            }
+        }
+
+        // Charger la clé API au démarrage
+        window.addEventListener('DOMContentLoaded', () => {
+            const input = document.getElementById('api-key-input');
+            if (input && apiKey) {
+                input.value = apiKey;
+            }
+        });
 
         // PWA Install Prompt
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -979,7 +1018,9 @@
         // Vérifier les transactions
         async function checkTransactions() {
             try {
-                const response = await fetch(`${API_BASE}/check_request/all`);
+                const response = await fetch(`${API_BASE}/check_request/all`, {
+                    headers: getHeaders()
+                });
                 const data = await response.json();
                 
                 if (data.success) {
@@ -1052,9 +1093,7 @@
             try {
                 const response = await fetch(`${API_BASE}/update_status`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: getHeaders(),
                     body: JSON.stringify({
                         reference: currentTransaction.reference,
                         status: status

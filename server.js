@@ -13,10 +13,12 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const TRANSACTIONS_FILE = path.join(__dirname, 'transactions.json');
+const API_KEYS_FILE = path.join(__dirname, 'api_keys.json');
 
 // Middleware
 app.use(cors());
@@ -29,6 +31,80 @@ if (!fs.existsSync(TRANSACTIONS_FILE)) {
     fs.writeFileSync(TRANSACTIONS_FILE, JSON.stringify([], null, 2));
     console.log('Fichier transactions.json créé');
 }
+
+// Créer api_keys.json s'il n'existe pas
+if (!fs.existsSync(API_KEYS_FILE)) {
+    fs.writeFileSync(API_KEYS_FILE, JSON.stringify([], null, 2));
+    console.log('Fichier api_keys.json créé');
+}
+
+// Helper: Charger les clés API
+function loadApiKeys() {
+    try {
+        if (fs.existsSync(API_KEYS_FILE)) {
+            const data = fs.readFileSync(API_KEYS_FILE, 'utf8');
+            return JSON.parse(data);
+        }
+        return [];
+    } catch (error) {
+        console.error('Erreur lors du chargement des clés API:', error);
+        return [];
+    }
+}
+
+// Helper: Sauvegarder les clés API
+function saveApiKeys(apiKeys) {
+    try {
+        fs.writeFileSync(API_KEYS_FILE, JSON.stringify(apiKeys, null, 2));
+        return true;
+    } catch (error) {
+        console.error('Erreur lors de la sauvegarde des clés API:', error);
+        return false;
+    }
+}
+
+// Helper: Générer une clé API unique
+function generateApiKey() {
+    return 'jpay_' + crypto.randomBytes(16).toString('hex');
+}
+
+// Helper: Vérifier la clé API
+function isValidApiKey(apiKey) {
+    const apiKeys = loadApiKeys();
+    return apiKeys.some(key => key.key === apiKey && key.active);
+}
+
+// Middleware: Vérifier la clé API (sauf pour les routes publiques)
+function checkApiKey(req, res, next) {
+    const apiKey = req.headers['x-api-key'];
+    
+    // Routes publiques (pas besoin de clé API)
+    const publicRoutes = ['/api/generate_key', '/api/verify_key'];
+    if (publicRoutes.some(route => req.path.startsWith(route))) {
+        return next();
+    }
+    
+    if (!apiKey) {
+        return res.status(401).json({
+            success: false,
+            message: 'Clé API manquante. Ajoutez le header "x-api-key" à vos requêtes.'
+        });
+    }
+    
+    if (!isValidApiKey(apiKey)) {
+        return res.status(401).json({
+            success: false,
+            message: 'Clé API invalide ou inactive.'
+        });
+    }
+    
+    // Ajouter l'API key à la requête pour utilisation ultérieure
+    req.apiKey = apiKey;
+    next();
+}
+
+// Appliquer le middleware à toutes les routes API
+app.use('/api', checkApiKey);
 
 // Helper: Charger les transactions
 function loadTransactions() {
@@ -67,11 +143,84 @@ function generateReference(service) {
 // ==========================================
 
 /**
+ * POST /api/generate_key
+ * Génère une nouvelle clé API
+ * Route publique (pas besoin de clé API)
+ */
+app.post('/api/generate_key', (req, res) => {
+    const { name, email } = req.body;
+    
+    if (!name || !email) {
+        return res.status(400).json({
+            success: false,
+            message: 'Paramètres manquants: name et email requis'
+        });
+    }
+    
+    const apiKeys = loadApiKeys();
+    const newKey = generateApiKey();
+    
+    const apiKeyData = {
+        key: newKey,
+        name,
+        email,
+        created_at: new Date().toISOString(),
+        active: true
+    };
+    
+    apiKeys.push(apiKeyData);
+    saveApiKeys(apiKeys);
+    
+    res.json({
+        success: true,
+        message: 'Clé API générée avec succès',
+        api_key: newKey,
+        name,
+        email,
+        created_at: apiKeyData.created_at
+    });
+});
+
+/**
+ * POST /api/verify_key
+ * Vérifie si une clé API est valide
+ * Route publique (pas besoin de clé API)
+ */
+app.post('/api/verify_key', (req, res) => {
+    const { api_key } = req.body;
+    
+    if (!api_key) {
+        return res.status(400).json({
+            success: false,
+            message: 'Paramètre manquant: api_key requis'
+        });
+    }
+    
+    const apiKeys = loadApiKeys();
+    const keyData = apiKeys.find(k => k.key === api_key);
+    
+    if (!keyData) {
+        return res.status(404).json({
+            success: false,
+            message: 'Clé API non trouvée'
+        });
+    }
+    
+    res.json({
+        success: true,
+        valid: keyData.active,
+        name: keyData.name,
+        email: keyData.email
+    });
+});
+
+/**
  * POST /api/initiate_pay
  * Initialise un paiement mobile
  */
 app.post('/api/initiate_pay', (req, res) => {
     const { amount, phone, service } = req.body;
+    const apiKey = req.apiKey;
 
     // Validation
     if (!amount || !phone || !service) {
@@ -96,7 +245,7 @@ app.post('/api/initiate_pay', (req, res) => {
         });
     }
 
-    // Créer la transaction
+    // Créer la transaction avec la clé API
     const reference = generateReference(service);
     const transactions = loadTransactions();
 
@@ -106,6 +255,7 @@ app.post('/api/initiate_pay', (req, res) => {
         phone,
         service: service.toLowerCase(),
         status: 'waiting',
+        api_key: apiKey, // Associer la transaction à la clé API
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
     };
@@ -127,6 +277,7 @@ app.post('/api/initiate_pay', (req, res) => {
  */
 app.get('/api/check_request', (req, res) => {
     const { reference } = req.query;
+    const apiKey = req.apiKey;
 
     if (!reference) {
         return res.status(400).json({
@@ -136,7 +287,7 @@ app.get('/api/check_request', (req, res) => {
     }
 
     const transactions = loadTransactions();
-    const transaction = transactions.find(t => t.reference === reference);
+    const transaction = transactions.find(t => t.reference === reference && t.api_key === apiKey);
 
     if (!transaction) {
         return res.status(404).json({
@@ -157,10 +308,13 @@ app.get('/api/check_request', (req, res) => {
  * Récupère toutes les transactions (pour le simulateur)
  */
 app.get('/api/check_request/all', (req, res) => {
+    const apiKey = req.apiKey;
     const transactions = loadTransactions();
+    // Filtrer par clé API
+    const userTransactions = transactions.filter(t => t.api_key === apiKey);
     res.json({
         success: true,
-        transactions
+        transactions: userTransactions
     });
 });
 
@@ -170,6 +324,7 @@ app.get('/api/check_request/all', (req, res) => {
  */
 app.post('/api/update_status', (req, res) => {
     const { reference, status } = req.body;
+    const apiKey = req.apiKey;
 
     if (!reference || !status) {
         return res.status(400).json({
@@ -187,7 +342,7 @@ app.post('/api/update_status', (req, res) => {
     }
 
     const transactions = loadTransactions();
-    const transactionIndex = transactions.findIndex(t => t.reference === reference);
+    const transactionIndex = transactions.findIndex(t => t.reference === reference && t.api_key === apiKey);
 
     if (transactionIndex === -1) {
         return res.status(404).json({
@@ -214,10 +369,13 @@ app.post('/api/update_status', (req, res) => {
  * Récupère toutes les transactions
  */
 app.get('/api/transactions', (req, res) => {
+    const apiKey = req.apiKey;
     const transactions = loadTransactions();
+    // Filtrer par clé API
+    const userTransactions = transactions.filter(t => t.api_key === apiKey);
     res.json({
         success: true,
-        transactions
+        transactions: userTransactions
     });
 });
 
@@ -226,10 +384,14 @@ app.get('/api/transactions', (req, res) => {
  * Supprime toutes les transactions (reset)
  */
 app.delete('/api/transactions', (req, res) => {
-    saveTransactions([]);
+    const apiKey = req.apiKey;
+    const transactions = loadTransactions();
+    // Ne supprimer que les transactions de cette clé API
+    const userTransactions = transactions.filter(t => t.api_key !== apiKey);
+    saveTransactions(userTransactions);
     res.json({
         success: true,
-        message: 'Transactions réinitialisées'
+        message: 'Transactions réinitialisées pour cette clé API'
     });
 });
 

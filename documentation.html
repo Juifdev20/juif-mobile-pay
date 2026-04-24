@@ -510,7 +510,37 @@
                 <i class="fas fa-lock"></i> Authentification
             </h2>
             <p style="color: var(--text-secondary); margin-bottom: 15px;">
-                Cette API est actuellement en mode développement et ne nécessite pas d'authentification. En production, nous recommandons d'ajouter une authentification par clé API ou JWT.
+                Cette API utilise un système de clés API pour isoler les transactions de chaque développeur. Chaque clé API vous permet d'accéder uniquement à vos propres transactions.
+            </p>
+            
+            <h3 style="margin: 20px 0 10px; font-size: 16px;">Générer une clé API</h3>
+            <div class="code-block">
+                <div class="code-header">
+                    <span class="code-title">cURL</span>
+                    <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                </div>
+                <pre><code class="language-bash">curl -X POST https://juif-mobile-pay-uead.onrender.com/api/generate_key \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Votre Nom",
+    "email": "votre@email.com"
+  }'</code></pre>
+            </div>
+
+            <h3 style="margin: 20px 0 10px; font-size: 16px;">Réponse</h3>
+            <div class="code-block">
+                <pre><code class="language-json">{
+  "success": true,
+  "message": "Clé API générée avec succès",
+  "api_key": "jpay_abc123def456...",
+  "name": "Votre Nom",
+  "email": "votre@email.com",
+  "created_at": "2026-04-24T14:00:00.000Z"
+}</code></pre>
+            </div>
+
+            <p style="color: var(--text-secondary); margin-top: 15px;">
+                <strong>Important :</strong> Conservez votre clé API en sécurité. Ne la partagez pas publiquement.
             </p>
         </div>
 
@@ -570,6 +600,7 @@
                     </div>
                     <pre><code class="language-bash">curl -X POST https://votre-domaine.com/api/initiate_pay \
   -H "Content-Type: application/json" \
+  -H "x-api-key: VOTRE_CLE_API" \
   -d '{
     "amount": 50000,
     "phone": "0828497218",
@@ -585,7 +616,8 @@
                     <pre><code class="language-javascript">const response = await fetch('https://votre-domaine.com/api/initiate_pay', {
   method: 'POST',
   headers: {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
+    'x-api-key': 'VOTRE_CLE_API'
   },
   body: JSON.stringify({
     amount: 50000,
@@ -659,7 +691,8 @@ console.log(data);</code></pre>
                         <span class="code-title">cURL</span>
                         <button class="copy-btn" onclick="copyCode(this)">Copier</button>
                     </div>
-                    <pre><code class="language-bash">curl -X GET "https://votre-domaine.com/api/check_request?reference=MPESA_20260424104100_f6k6n1mv"</code></pre>
+                    <pre><code class="language-bash">curl -X GET "https://votre-domaine.com/api/check_request?reference=MPESA_20260424104100_f6k6n1mv" \
+  -H "x-api-key: VOTRE_CLE_API"</code></pre>
                 </div>
 
                 <h3 style="margin: 20px 0 10px; font-size: 16px;">Réponse Succès (200)</h3>
@@ -738,6 +771,7 @@ console.log(data);</code></pre>
                     </div>
                     <pre><code class="language-bash">curl -X POST https://votre-domaine.com/api/update_status \
   -H "Content-Type: application/json" \
+  -H "x-api-key: VOTRE_CLE_API" \
   -d '{
     "reference": "MPESA_20260424104100_f6k6n1mv",
     "status": "SUCCESS"
@@ -768,7 +802,7 @@ console.log(data);</code></pre>
                     <span class="method method-get">GET</span>
                     <span class="endpoint-url">/api/transactions</span>
                 </div>
-                <p class="endpoint-description">Récupère toutes les transactions enregistrées.</p>
+                <p class="endpoint-description">Récupère toutes les transactions (uniquement celles associées à votre clé API).</p>
                 
                 <h3 style="margin: 20px 0 10px; font-size: 16px;">Exemple de Requête</h3>
                 <div class="code-block">
@@ -776,7 +810,8 @@ console.log(data);</code></pre>
                         <span class="code-title">cURL</span>
                         <button class="copy-btn" onclick="copyCode(this)">Copier</button>
                     </div>
-                    <pre><code class="language-bash">curl -X GET https://votre-domaine.com/api/transactions</code></pre>
+                    <pre><code class="language-bash">curl -X GET https://votre-domaine.com/api/transactions \
+  -H "x-api-key: VOTRE_CLE_API"</code></pre>
                 </div>
 
                 <h3 style="margin: 20px 0 10px; font-size: 16px;">Réponse Succès (200)</h3>
@@ -808,7 +843,7 @@ console.log(data);</code></pre>
                 <div class="endpoint-header">
                     <span class="method method-delete">DELETE</span>
                     <span class="endpoint-url">/api/transactions</span>
-                </div>
+                </div>uniqumnclessociésàvtre cl API
                 <p class="endpoint-description">Supprime toutes les transactions (reset de la base de données).</p>
                 
                 <h3 style="margin: 20px 0 10px; font-size: 16px;">Exemple de Requête</h3>
@@ -816,9 +851,7 @@ console.log(data);</code></pre>
                     <div class="code-header">
                         <span class="code-title">cURL</span>
                         <button class="copy-btn" onclick="copyCode(this)">Copier</button>
-                    </div>
-                    <pre><code class="language-bash">curl -X DELETE https://votre-domaine.com/api/transactions</code></pre>
-                </div>
+                    </div>class="language-bash">curl -X DELETE https://votre-domaine.com/api/transactions</cod
 
                 <h3 style="margin: 20px 0 10px; font-size: 16px;">Réponse Succès (200)</h3>
                 <div class="code-block">
