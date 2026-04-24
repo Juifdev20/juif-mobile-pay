@@ -141,11 +141,94 @@
         .main-content {
             flex: 1;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             padding: 40px 20px;
             position: relative;
             z-index: 5;
+            gap: 30px;
+        }
+
+        /* API Key Section */
+        .api-key-section {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--accent);
+            border-radius: 20px;
+            padding: 25px 30px;
+            width: 100%;
+            max-width: 600px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .api-key-section h3 {
+            color: var(--accent);
+            font-size: 20px;
+            margin: 0 0 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .api-key-display-current {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .api-key-value {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .api-key-value span {
+            flex: 1;
+            color: #ffffff;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            word-break: break-all;
+        }
+
+        .copy-current-key {
+            background: var(--accent);
+            border: none;
+            color: var(--primary);
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .copy-current-key:hover {
+            background: #ffaa00;
+            transform: scale(1.05);
+        }
+
+        .api-key-hint {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+            margin: 0;
+            font-style: italic;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .container {
@@ -687,6 +770,9 @@
 
             .header-actions {
                 gap: 8px;
+                width: 100%;
+                justify-content: flex-end;
+                margin-top: 10px;
             }
 
             .action-btn {
@@ -694,8 +780,34 @@
                 font-size: 0.8rem;
             }
 
+            .api-key-btn {
+                padding: 8px 12px !important;
+                font-size: 0.8rem !important;
+            }
+
+            .api-key-section {
+                padding: 20px;
+                max-width: 100%;
+            }
+
+            .api-key-section h3 {
+                font-size: 18px;
+            }
+
+            .api-key-value {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .copy-current-key {
+                width: 100%;
+                justify-content: center;
+                padding: 12px;
+            }
+
             .main-content {
                 padding: 30px 15px;
+                gap: 20px;
             }
 
             .phone-container {
@@ -846,16 +958,16 @@
 
     .form-group label {
         font-size: 14px;
-        color: var(--text-secondary);
-        font-weight: 500;
+        color: var(--accent);
+        font-weight: 600;
     }
 
     .form-group input {
         padding: 12px 15px;
         border-radius: 10px;
-        border: 1px solid var(--border);
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
+        border: 2px solid rgba(255, 215, 0, 0.3);
+        background: rgba(0, 0, 0, 0.4);
+        color: #ffffff;
         font-size: 16px;
         outline: none;
         transition: all 0.3s;
@@ -863,7 +975,8 @@
 
     .form-group input:focus {
         border-color: var(--accent);
-        background: rgba(255, 255, 255, 0.15);
+        background: rgba(0, 0, 0, 0.5);
+        box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
     }
 
     .form-group input::placeholder {
@@ -1047,8 +1160,8 @@
             <div class="logo-text">Juif Mobile <span>Pay</span></div>
         </div>
         <div class="header-actions">
-            <button class="action-btn" onclick="showApiKeyModal()" style="padding: 8px 12px; font-size: 12px;" title="Générer clé API">
-                <i class="fas fa-key"></i>
+            <button class="action-btn api-key-btn" onclick="showApiKeyModal()" style="padding: 10px 15px; font-size: 14px; background: linear-gradient(135deg, var(--accent) 0%, #ffaa00 100%); color: var(--primary); font-weight: 600;">
+                <i class="fas fa-key"></i> Clé API
             </button>
             <button class="action-btn" onclick="installApp()" id="install-btn" style="display: none;">
                 <i class="fas fa-download"></i> Installer
@@ -1064,6 +1177,20 @@
 
     <main class="main-content">
         <div class="container">
+            <!-- Section Clé API Actuelle -->
+            <div class="api-key-section" id="current-api-key-section">
+                <h3><i class="fas fa-key"></i> Votre Clé API</h3>
+                <div class="api-key-display-current">
+                    <div class="api-key-value" id="current-api-key-value">
+                        <span id="api-key-text">Non définie</span>
+                        <button class="copy-current-key" onclick="copyCurrentApiKey()" id="copy-current-btn" style="display: none;">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                    <p class="api-key-hint">Cliquez sur "Clé API" dans le menu pour en générer une</p>
+                </div>
+            </div>
+
             <div class="phone-section">
                 <div class="phone-container">
                     <div class="phone-screen">
@@ -1270,6 +1397,7 @@
                     setApiKey(data.api_key);
                     document.getElementById('generated-api-key').value = data.api_key;
                     document.getElementById('api-result').style.display = 'flex';
+                    updateCurrentApiKeyDisplay();
                 } else {
                     document.getElementById('generate-btn').style.display = 'flex';
                     alert('Erreur lors de la génération de la clé API : ' + data.message);
@@ -1284,8 +1412,41 @@
 
         // Charger la clé API au démarrage
         window.addEventListener('DOMContentLoaded', () => {
-            // La clé est déjà chargée via localStorage
+            updateCurrentApiKeyDisplay();
         });
+
+        // Mettre à jour l'affichage de la clé API actuelle
+        function updateCurrentApiKeyDisplay() {
+            const apiKeyText = document.getElementById('api-key-text');
+            const copyBtn = document.getElementById('copy-current-btn');
+            const hint = document.querySelector('.api-key-hint');
+            
+            if (apiKey && apiKey.length > 0) {
+                apiKeyText.textContent = apiKey;
+                copyBtn.style.display = 'block';
+                hint.textContent = 'Cliquez sur le bouton pour copier votre clé API';
+            } else {
+                apiKeyText.textContent = 'Non définie';
+                copyBtn.style.display = 'none';
+                hint.textContent = 'Cliquez sur "Clé API" dans le menu pour en générer une';
+            }
+        }
+
+        // Copier la clé API actuelle
+        function copyCurrentApiKey() {
+            if (apiKey) {
+                navigator.clipboard.writeText(apiKey).then(() => {
+                    const copyBtn = document.getElementById('copy-current-btn');
+                    const originalText = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+                    setTimeout(() => {
+                        copyBtn.innerHTML = originalText;
+                    }, 2000);
+                }).catch(() => {
+                    alert('Clé API copiée !');
+                });
+            }
+        }
 
         // PWA Install Prompt
         window.addEventListener('beforeinstallprompt', (e) => {
