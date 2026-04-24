@@ -761,6 +761,9 @@
             <div class="logo-text">Juif Mobile <span>Pay</span></div>
         </div>
         <div class="header-actions">
+            <button class="action-btn" onclick="installApp()" id="install-btn" style="display: none;">
+                <i class="fas fa-download"></i> Installer
+            </button>
             <a href="/documentation.html" class="action-btn">
                 <i class="fas fa-book"></i> Documentation
             </a>
@@ -902,6 +905,42 @@
         let currentService = 'mpesa';
         let currentTransaction = null;
         let checkInterval = null;
+        let deferredPrompt = null;
+
+        // PWA Install Prompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const installBtn = document.getElementById('install-btn');
+            if (installBtn) {
+                installBtn.style.display = 'block';
+            }
+        });
+
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('App installée');
+                    }
+                    deferredPrompt = null;
+                    const installBtn = document.getElementById('install-btn');
+                    if (installBtn) {
+                        installBtn.style.display = 'none';
+                    }
+                });
+            }
+        }
+
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').then((reg) => {
+                console.log('Service Worker enregistré:', reg);
+            }).catch((err) => {
+                console.log('Service Worker erreur:', err);
+            });
+        }
 
         
         
