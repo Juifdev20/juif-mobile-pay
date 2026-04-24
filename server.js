@@ -26,6 +26,29 @@ app.use(express.json());
 app.use(express.static(__dirname));
 app.use(express.static(path.join(__dirname, '..')));  // Servir le dossier parent (exame-ecommerce)
 
+// Servir le manifest.json avec le bon Content-Type
+app.get('/manifest.json', (req, res) => {
+    res.setHeader('Content-Type', 'application/manifest+json');
+    res.sendFile(path.join(__dirname, 'manifest.json'));
+});
+
+// Servir le service worker avec le bon Content-Type
+app.get('/sw.js', (req, res) => {
+    res.setHeader('Content-Type', 'application/javascript');
+    res.sendFile(path.join(__dirname, 'sw.js'));
+});
+
+// Servir les icônes PNG
+app.get('/icon-192.png', (req, res) => {
+    res.setHeader('Content-Type', 'image/png');
+    res.sendFile(path.join(__dirname, 'icon-192.png'));
+});
+
+app.get('/icon-512.png', (req, res) => {
+    res.setHeader('Content-Type', 'image/png');
+    res.sendFile(path.join(__dirname, 'icon-512.png'));
+});
+
 // Créer transactions.json s'il n'existe pas
 if (!fs.existsSync(TRANSACTIONS_FILE)) {
     fs.writeFileSync(TRANSACTIONS_FILE, JSON.stringify([], null, 2));
