@@ -1472,6 +1472,52 @@
         align-items: center;
         gap: 12px;
     }
+
+    .toggle-container {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        padding: 5px;
+    }
+
+    .toggle-btn {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 8px;
+        background: transparent;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .toggle-btn:hover {
+        color: white;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .toggle-btn.active {
+        background: linear-gradient(135deg, var(--accent) 0%, #ffaa00 100%);
+        color: var(--primary);
+        box-shadow: 0 4px 15px rgba(255, 170, 0, 0.3);
+    }
+
+    .key-form {
+        animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
     </style>
 </head>
 <body>
@@ -1481,34 +1527,65 @@
     <div id="api-key-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3><i class="fas fa-key"></i> Générer Clé API</h3>
+                <h3><i class="fas fa-key"></i> Clé API</h3>
                 <button class="modal-close" onclick="closeApiKeyModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="form-group">
-                    <label for="api-name">Nom complet</label>
-                    <input type="text" id="api-name" placeholder="Votre nom" autocomplete="off">
+                <!-- Toggle entre nouvelle clé et clé existante -->
+                <div class="toggle-container">
+                    <button class="toggle-btn active" id="btn-new-key" onclick="showNewKeyForm()">
+                        <i class="fas fa-plus"></i> Nouvelle clé
+                    </button>
+                    <button class="toggle-btn" id="btn-existing-key" onclick="showExistingKeyForm()">
+                        <i class="fas fa-paste"></i> Clé existante
+                    </button>
                 </div>
-                <div class="form-group">
-                    <label for="api-email">Email</label>
-                    <input type="email" id="api-email" placeholder="votre@email.com" autocomplete="off">
-                </div>
-                <button class="btn-generate" onclick="generateApiKey()" id="generate-btn">
-                    <i class="fas fa-key"></i> Générer ma clé API
-                </button>
-                <div id="loading-spinner" class="loading-spinner" style="display: none;">
-                    <div class="spinner"></div>
-                    <p>Génération de votre clé API en cours...</p>
-                </div>
-                <div id="api-result" class="api-result" style="display: none;">
-                    <p class="success-message"><i class="fas fa-check-circle"></i> Clé API générée avec succès !</p>
-                    <div class="api-key-display">
-                        <input type="text" id="generated-api-key" readonly>
-                        <button class="copy-btn" onclick="copyApiKey()">
-                            <i class="fas fa-copy"></i> Copier
-                        </button>
+
+                <!-- Formulaire nouvelle clé -->
+                <div id="new-key-form" class="key-form">
+                    <div class="form-group">
+                        <label for="api-name">Nom complet</label>
+                        <input type="text" id="api-name" placeholder="Votre nom" autocomplete="off">
                     </div>
-                    <p class="info-message"><i class="fas fa-info-circle"></i> Votre clé API a été automatiquement sauvegardée.</p>
+                    <div class="form-group">
+                        <label for="api-email">Email</label>
+                        <input type="email" id="api-email" placeholder="votre@email.com" autocomplete="off">
+                    </div>
+                    <button class="btn-generate" onclick="generateApiKey()" id="generate-btn">
+                        <i class="fas fa-key"></i> Générer ma clé API
+                    </button>
+                    <div id="loading-spinner" class="loading-spinner" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>Génération de votre clé API en cours...</p>
+                    </div>
+                    <div id="api-result" class="api-result" style="display: none;">
+                        <p class="success-message"><i class="fas fa-check-circle"></i> Clé API générée avec succès !</p>
+                        <div class="api-key-display">
+                            <input type="text" id="generated-api-key" readonly>
+                            <button class="copy-btn" onclick="copyApiKey()">
+                                <i class="fas fa-copy"></i> Copier
+                            </button>
+                        </div>
+                        <p class="info-message"><i class="fas fa-info-circle"></i> Votre clé API a été automatiquement sauvegardée.</p>
+                    </div>
+                </div>
+
+                <!-- Formulaire clé existante -->
+                <div id="existing-key-form" class="key-form" style="display: none;">
+                    <div class="form-group">
+                        <label for="existing-api-key">Collez votre clé API existante</label>
+                        <input type="text" id="existing-api-key" placeholder="JUIFMOBILEPAYAPI_xxxxxxxxxxxxxx" autocomplete="off">
+                    </div>
+                    <p class="info-message" style="margin-bottom: 15px;">
+                        <i class="fas fa-info-circle"></i> Collez votre clé API d'un autre appareil pour continuer sans en générer une nouvelle.
+                    </p>
+                    <button class="btn-generate" onclick="useExistingApiKey()" id="use-existing-btn">
+                        <i class="fas fa-check"></i> Utiliser cette clé
+                    </button>
+                    <div id="existing-key-result" class="api-result" style="display: none;">
+                        <p class="success-message"><i class="fas fa-check-circle"></i> Clé API activée avec succès !</p>
+                        <p class="info-message"><i class="fas fa-info-circle"></i> Vous pouvez maintenant utiliser le simulateur avec votre clé existante.</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1835,6 +1912,57 @@
             document.getElementById('generate-btn').style.display = 'flex';
             document.getElementById('loading-spinner').style.display = 'none';
             document.getElementById('api-result').style.display = 'none';
+            document.getElementById('existing-api-key').value = '';
+            document.getElementById('existing-key-result').style.display = 'none';
+            // Show new key form by default
+            showNewKeyForm();
+        }
+
+        // Afficher le formulaire nouvelle clé
+        function showNewKeyForm() {
+            document.getElementById('new-key-form').style.display = 'block';
+            document.getElementById('existing-key-form').style.display = 'none';
+            document.getElementById('btn-new-key').classList.add('active');
+            document.getElementById('btn-existing-key').classList.remove('active');
+        }
+
+        // Afficher le formulaire clé existante
+        function showExistingKeyForm() {
+            document.getElementById('new-key-form').style.display = 'none';
+            document.getElementById('existing-key-form').style.display = 'block';
+            document.getElementById('btn-new-key').classList.remove('active');
+            document.getElementById('btn-existing-key').classList.add('active');
+        }
+
+        // Utiliser une clé API existante
+        function useExistingApiKey() {
+            const existingKey = document.getElementById('existing-api-key').value.trim();
+            
+            if (!existingKey) {
+                alert('Veuillez coller votre clé API !');
+                return;
+            }
+
+            if (!existingKey.startsWith('JUIFMOBILEPAYAPI_')) {
+                alert('Format de clé API invalide ! La clé doit commencer par "JUIFMOBILEPAYAPI_"');
+                return;
+            }
+
+            // Sauvegarder la clé API
+            localStorage.setItem('apiKey', existingKey);
+            apiKey = existingKey;
+            
+            // Afficher le succès
+            document.getElementById('existing-key-result').style.display = 'block';
+            
+            // Mettre à jour l'affichage
+            updateApiKeyDisplay();
+            
+            // Fermer le modal après 2 secondes
+            setTimeout(() => {
+                closeApiKeyModal();
+                checkTransactions();
+            }, 2000);
         }
 
         // Fermer la modal
