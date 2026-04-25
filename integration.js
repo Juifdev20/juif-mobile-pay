@@ -28,17 +28,42 @@ class MobilePayment {
     }
 
     /**
-     * Initie un paiement mobile
+     * Initie un paiement mobile avec option de routage
      * @param {number} amount - Montant du paiement
-     * @param {string} phone - Numéro de téléphone
+     * @param {string} phone - Numéro de téléphone du payeur
      * @param {string} service - Service de paiement (mpesa, airtel, orange)
-     * @param {object} callbacks - Callbacks (onSuccess, onCancel, onError, onWaiting)
+     * @param {object} options - Options additionnelles (callbacks, routing)
+     * @param {object} options.routing - Configuration de routage optionnelle
+     * @param {string} options.routing.recipient_account - Compte destinataire
+     * @param {string} options.routing.recipient_name - Nom du bénéficiaire
+     * @param {object} options.callbacks - Callbacks (onSuccess, onCancel, onError, onWaiting)
      */
-    async initiate(amount, phone, service, callbacks = {}) {
+    async initiate(amount, phone, service, options = {}) {
         try {
             // Valider les paramètres
             if (!amount || !phone || !service) {
                 throw new Error('Paramètres manquants: amount, phone, service requis');
+            }
+
+            // Extraire callbacks et routing des options
+            const callbacks = options.callbacks || options;
+            const routing = options.routing || null;
+
+            // Préparer le corps de la requête
+            const requestBody = {
+                amount: amount,
+                phone: phone,
+                service: service
+            };
+
+            // Ajouter les paramètres de routage si fournis
+            if (routing) {
+                if (routing.recipient_account) {
+                    requestBody.recipient_account = routing.recipient_account;
+                }
+                if (routing.recipient_name) {
+                    requestBody.recipient_name = routing.recipient_name;
+                }
             }
 
             // Appeler l'API d'initialisation
@@ -54,11 +79,7 @@ class MobilePayment {
             const response = await fetch(`${this.apiBaseUrl}/initiate_pay`, {
                 method: 'POST',
                 headers: headers,
-                body: JSON.stringify({
-                    amount: amount,
-                    phone: phone,
-                    service: service
-                })
+                body: JSON.stringify(requestBody)
             });
 
             const data = await response.json();
