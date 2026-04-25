@@ -976,6 +976,223 @@ console.log(data);</code></pre>
             </div>
         </div>
 
+        <!-- Routing Section -->
+        <div class="section">
+            <h2 class="section-title">
+                <i class="fas fa-route"></i> Routage des Paiements
+            </h2>
+            <div style="background: rgba(0, 255, 136, 0.1); border-left: 4px solid #00ff88; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <p style="color: #00ff88; margin: 0;">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Nouveau !</strong> Routez les paiements vers un compte spécifique au lieu du numéro du payeur.
+                    Idéal pour les entreprises qui collectent des paiements pour le compte de tiers.
+                </p>
+            </div>
+
+            <!-- Initiate Pay avec routage -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method method-post">POST</span>
+                    <span class="endpoint-url">/api/initiate_pay (avec routage)</span>
+                </div>
+                <p class="endpoint-description">Initie un paiement avec option de routage vers un compte spécifique.</p>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Paramètres Supplémentaires</h3>
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>Paramètre</th>
+                            <th>Type</th>
+                            <th>Requis</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>recipient_account</code></td>
+                            <td>string</td>
+                            <td>Optionnel</td>
+                            <td>Numéro de compte qui recevra le paiement (min. 9 chiffres)</td>
+                        </tr>
+                        <tr>
+                            <td><code>recipient_name</code></td>
+                            <td>string</td>
+                            <td>Optionnel</td>
+                            <td>Nom du bénéficiaire (pour affichage)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Exemple avec Routage</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-title">cURL</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    </div>
+                    <pre><code class="language-bash">curl -X POST https://juif-mobile-pay-uead.onrender.com/api/initiate_pay \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: VOTRE_CLE_API" \
+  -d '{
+    "amount": 5000,
+    "phone": "243818811213",
+    "service": "mpesa",
+    "recipient_account": "243999999999",
+    "recipient_name": "Entreprise XYZ"
+  }'</code></pre>
+                </div>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Réponse avec Routage</h3>
+                <div class="code-block">
+                    <pre><code class="language-json">{
+  "success": true,
+  "reference": "MPESA_20260425115000_abc123",
+  "message": "Transaction initiée avec routage vers compte spécifique",
+  "transaction": {
+    "reference": "MPESA_20260425115000_abc123",
+    "amount": 5000,
+    "phone": "243818811213",
+    "service": "mpesa",
+    "recipient_account": "243999999999",
+    "recipient_name": "Entreprise XYZ",
+    "routing_status": "routed",
+    "status": "waiting",
+    "routing_info": {
+      "recipient_account": "243999999999",
+      "recipient_name": "Entreprise XYZ",
+      "message": "Le paiement sera transféré vers ce compte après confirmation"
+    }
+  }
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- Get Routing Config -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method method-get">GET</span>
+                    <span class="endpoint-url">/api/routing_config</span>
+                </div>
+                <p class="endpoint-description">Récupère la configuration de routage par défaut.</p>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Exemple de Requête</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-title">cURL</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    </div>
+                    <pre><code class="language-bash">curl -X GET https://juif-mobile-pay-uead.onrender.com/api/routing_config \
+  -H "x-api-key: VOTRE_CLE_API"</code></pre>
+                </div>
+            </div>
+
+            <!-- Set Routing Config -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method method-post">POST</span>
+                    <span class="endpoint-url">/api/routing_config</span>
+                </div>
+                <p class="endpoint-description">Configure un compte de destination par défaut pour tous les paiements.</p>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Paramètres</h3>
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>Paramètre</th>
+                            <th>Type</th>
+                            <th>Requis</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>recipient_account</code></td>
+                            <td>string</td>
+                            <td>Oui</td>
+                            <td>Numéro de compte destinataire (min. 9 chiffres)</td>
+                        </tr>
+                        <tr>
+                            <td><code>recipient_name</code></td>
+                            <td>string</td>
+                            <td>Optionnel</td>
+                            <td>Nom du bénéficiaire</td>
+                        </tr>
+                        <tr>
+                            <td><code>description</code></td>
+                            <td>string</td>
+                            <td>Optionnel</td>
+                            <td>Description de la configuration</td>
+                        </tr>
+                        <tr>
+                            <td><code>auto_route</code></td>
+                            <td>boolean</td>
+                            <td>Optionnel</td>
+                            <td>Activer le routage automatique (défaut: true)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Exemple</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-title">cURL</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    </div>
+                    <pre><code class="language-bash">curl -X POST https://juif-mobile-pay-uead.onrender.com/api/routing_config \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: VOTRE_CLE_API" \
+  -d '{
+    "recipient_account": "243999999999",
+    "recipient_name": "Mon Entreprise",
+    "description": "Compte principal pour les collections",
+    "auto_route": true
+  }'</code></pre>
+                </div>
+            </div>
+
+            <!-- Routing Transactions -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method method-get">GET</span>
+                    <span class="endpoint-url">/api/routing/transactions</span>
+                </div>
+                <p class="endpoint-description">Récupère toutes les transactions avec les informations de routage.</p>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Exemple de Requête</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-title">cURL</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    </div>
+                    <pre><code class="language-bash">curl -X GET https://juif-mobile-pay-uead.onrender.com/api/routing/transactions \
+  -H "x-api-key: VOTRE_CLE_API"</code></pre>
+                </div>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Réponse</h3>
+                <div class="code-block">
+                    <pre><code class="language-json">{
+  "success": true,
+  "count": 2,
+  "transactions": [
+    {
+      "reference": "MPESA_20260425115000_abc123",
+      "amount": 5000,
+      "recipient_account": "243999999999",
+      "routing_display": "Transfert vers 243999999999",
+      "status": "completed"
+    },
+    {
+      "reference": "MPESA_20260425120000_def456",
+      "amount": 3000,
+      "recipient_account": "243818811213",
+      "routing_display": "Paiement direct",
+      "status": "completed"
+    }
+  ]
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
         <!-- Admin API Section -->
         <div class="section">
             <h2 class="section-title">
