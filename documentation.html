@@ -868,6 +868,182 @@ console.log(data);</code></pre>
             </div>
         </div>
 
+        <!-- Additional Public Endpoints -->
+        <div class="section">
+            <h2 class="section-title">
+                <i class="fas fa-plug"></i> Endpoints Publics Supplémentaires
+            </h2>
+
+            <!-- Verify Key -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method method-post">POST</span>
+                    <span class="endpoint-url">/api/verify_key</span>
+                </div>
+                <p class="endpoint-description">Vérifie si une clé API est valide et active.</p>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Paramètres</h3>
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>Paramètre</th>
+                            <th>Type</th>
+                            <th>Requis</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>api_key</code></td>
+                            <td>string</td>
+                            <td>Oui</td>
+                            <td>Clé API à vérifier</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Exemple de Requête</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-title">cURL</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    </div>
+                    <pre><code class="language-bash">curl -X POST https://juif-mobile-pay-uead.onrender.com/api/verify_key \
+  -H "Content-Type: application/json" \
+  -d '{
+    "api_key": "JUIFMOBILEPAYAPI_46e0a735f979e376578dea4a1701dc7a"
+  }'</code></pre>
+                </div>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Réponse Succès (200)</h3>
+                <div class="code-block">
+                    <pre><code class="language-json">{
+  "success": true,
+  "valid": true,
+  "message": "Clé API valide",
+  "created_at": "2026-04-24T10:41:00.000Z"
+}</code></pre>
+                </div>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Réponse Erreur (400/401)</h3>
+                <div class="code-block">
+                    <pre><code class="language-json">{
+  "success": false,
+  "valid": false,
+  "message": "Clé API invalide ou désactivée"
+}</code></pre>
+                </div>
+            </div>
+
+            <!-- Check All Requests -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method method-get">GET</span>
+                    <span class="endpoint-url">/api/check_request/all</span>
+                </div>
+                <p class="endpoint-description">Récupère toutes les transactions (utilisé par le simulateur de paiement). <strong>Route publique pour la simulation.</strong></p>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Paramètres de Requête</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 10px;">Aucun paramètre requis. Cette route retourne toutes les transactions en cours pour le simulateur.</p>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Exemple de Requête</h3>
+                <div class="code-block">
+                    <div class="code-header">
+                        <span class="code-title">cURL</span>
+                        <button class="copy-btn" onclick="copyCode(this)">Copier</button>
+                    </div>
+                    <pre><code class="language-bash">curl -X GET https://juif-mobile-pay-uead.onrender.com/api/check_request/all</code></pre>
+                </div>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Réponse Succès (200)</h3>
+                <div class="code-block">
+                    <pre><code class="language-json">{
+  "success": true,
+  "transactions": [
+    {
+      "reference": "MPESA_20260424104100_f6k6n1mv",
+      "amount": 1000,
+      "phone": "243818811213",
+      "service": "mpesa",
+      "status": "pending",
+      "created_at": "2026-04-24T10:41:00.123Z",
+      "updated_at": null,
+      "api_key": "JUIFMOBILEPAYAPI_..."
+    }
+  ]
+}</code></pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin API Section -->
+        <div class="section">
+            <h2 class="section-title">
+                <i class="fas fa-lock"></i> API Administration (Privée)
+            </h2>
+            <div style="background: rgba(255, 193, 7, 0.1); border-left: 4px solid #ffc107; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <p style="color: #ffc107; margin: 0;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Ces endpoints sont réservés aux administrateurs et nécessitent une clé API admin spéciale.</strong>
+                    Ils ne sont pas destinés à être utilisés par les utilisateurs finaux.
+                </p>
+            </div>
+
+            <!-- Admin Stats -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method method-get">GET</span>
+                    <span class="endpoint-url">/api/admin/stats</span>
+                </div>
+                <p class="endpoint-description">Récupère les statistiques globales (nombre d'utilisateurs, transactions, etc.). <strong>Accès admin uniquement.</strong></p>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Headers Requis</h3>
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>Header</th>
+                            <th>Valeur</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>x-api-key</code></td>
+                            <td>Clé admin</td>
+                            <td>Clé API d'administration spéciale</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Admin Disable Key -->
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method method-delete">DELETE</span>
+                    <span class="endpoint-url">/api/admin/api_keys/:key</span>
+                </div>
+                <p class="endpoint-description">Désactive une clé API utilisateur. <strong>Accès admin uniquement.</strong></p>
+
+                <h3 style="margin: 20px 0 10px; font-size: 16px;">Paramètres d'URL</h3>
+                <table class="param-table">
+                    <thead>
+                        <tr>
+                            <th>Paramètre</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>:key</code></td>
+                            <td>string</td>
+                            <td>Clé API à désactiver</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- Contact Section -->
         <div class="section">
             <h2 class="section-title">
