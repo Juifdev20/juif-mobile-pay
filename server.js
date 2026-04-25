@@ -61,6 +61,46 @@ if (!fs.existsSync(API_KEYS_FILE)) {
     console.log('Fichier api_keys.json créé');
 }
 
+// Fichier pour les configurations de routage
+const ROUTING_CONFIG_FILE = path.join(__dirname, 'routing_configs.json');
+if (!fs.existsSync(ROUTING_CONFIG_FILE)) {
+    fs.writeFileSync(ROUTING_CONFIG_FILE, JSON.stringify({}, null, 2));
+    console.log('Fichier routing_configs.json créé');
+}
+
+// Helper: Valider un numéro de téléphone
+function isValidPhoneNumber(phone) {
+    // Enlever les espaces et les + au début
+    const cleanPhone = phone.replace(/\s/g, '').replace(/^\+/, '');
+    // Vérifier si c'est un nombre et a au moins 9 chiffres
+    return /^\d{9,}$/.test(cleanPhone);
+}
+
+// Helper: Charger les configurations de routage
+function loadRoutingConfigs() {
+    try {
+        if (fs.existsSync(ROUTING_CONFIG_FILE)) {
+            const data = fs.readFileSync(ROUTING_CONFIG_FILE, 'utf8');
+            return JSON.parse(data);
+        }
+        return {};
+    } catch (error) {
+        console.error('Erreur lors du chargement des configs de routage:', error);
+        return {};
+    }
+}
+
+// Helper: Sauvegarder les configurations de routage
+function saveRoutingConfigs(configs) {
+    try {
+        fs.writeFileSync(ROUTING_CONFIG_FILE, JSON.stringify(configs, null, 2));
+        return true;
+    } catch (error) {
+        console.error('Erreur lors de la sauvegarde des configs de routage:', error);
+        return false;
+    }
+}
+
 // Helper: Charger les clés API
 function loadApiKeys() {
     try {
@@ -248,10 +288,10 @@ app.post('/api/verify_key', (req, res) => {
 
 /**
  * POST /api/initiate_pay
- * Initialise un paiement mobile
+ * Initialise un paiement mobile avec routage vers compte spécifique
  */
 app.post('/api/initiate_pay', (req, res) => {
-    const { amount, phone, service } = req.body;
+    const { amount, phone, service, recipient_account, recipient_name } = req.body;
     const apiKey = req.apiKey;
 
     // Validation
@@ -277,7 +317,15 @@ app.post('/api/initiate_pay', (req, res) => {
         });
     }
 
-    // Créer la transaction avec la clé API
+    // Validation du compte destinataire si fourni
+    if (recipient_account && !isValidPhoneNumber(recipient_account)) {
+        return res.status(400).json({
+            success: false,
+            message: 'Numéro de compte destinataire invalide'
+        });
+    }
+
+    // Créer la transaction avec la clé API et le routage
     const reference = generateReference(service);
     const transactions = loadTransactions();
 
@@ -286,8 +334,11 @@ app.post('/api/initiate_pay', (req, res) => {
         amount: parseFloat(amount),
         phone,
         service: service.toLowerCase(),
+        recipient_account: recipient_account || phone, // Par défaut, le numéro du payeur
+        recipient_name: recipient_name || null,
         status: 'waiting',
         api_key: apiKey, // Associer la transaction à la clé API
+        routing_status: recipient_account ? 'routed' : 'default',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
     };
@@ -298,8 +349,19 @@ app.post('/api/initiate_pay', (req, res) => {
     res.json({
         success: true,
         reference,
-        message: 'Transaction initiée avec succès',
-        transaction
+        message: recipient_account 
+            ? 'Transaction initiée avec routage vers compte spécifique' 
+            : 'Transaction initiée (routage par défaut)',
+        transaction: {
+            ...transaction,
+            routing_info: recipient_account ? {
+                recipient_account,
+                recipient_name,
+                message: 'Le paiement sera transféré vers ce compte après confirmation'
+            } : {
+                message: 'Le paiement sera effectué sur le numéro du payeur'
+            }
+        }
     });
 });
 
@@ -512,6 +574,119 @@ app.delete('/api/admin/api_keys/:key', (req, res) => {
 });
 
 // ==========================================
+// ROUTING CONFIGURATION ENDPOINTS
+// ==========================================
+
+/**
+ * GET /api/routing_config
+ * Récupère la configuration de routage de l'utilisateur
+ */
+app.get('/api/routing_config', (req, res) => {
+    const apiKey = req.apiKey;
+    const configs = loadRoutingConfigs();
+    
+    res.json({
+        success: true,
+        config: configs[apiKey] || null,
+        message: configs[apiKey] 
+            ? 'Configuration de routage trouvée' 
+            : 'Aucune configuration de routage. Utilisez POST pour en créer une.'
+    });
+});
+
+/**
+ * POST /api/routing_config
+ * Configure le compte de destination par défaut pour les paiements
+ */
+app.post('/api/routing_config', (req, res) => {
+    const apiKey = req.apiKey;
+    const { recipient_account, recipient_name, description, auto_route } = req.body;
+    
+    // Validation
+    if (!recipient_account) {
+        return res.status(400).json({
+            success: false,
+            message: 'Paramètre manquant: recipient_account requis'
+        });
+    }
+    
+    if (!isValidPhoneNumber(recipient_account)) {
+        return res.status(400).json({
+            success: false,
+            message: 'Numéro de compte destinataire invalide (minimum 9 chiffres)'
+        });
+    }
+    
+    const configs = loadRoutingConfigs();
+    
+    // Créer ou mettre à jour la configuration
+    configs[apiKey] = {
+        recipient_account,
+        recipient_name: recipient_name || null,
+        description: description || 'Compte de destination par défaut',
+        auto_route: auto_route !== false, // Par défaut true
+        updated_at: new Date().toISOString()
+    };
+    
+    saveRoutingConfigs(configs);
+    
+    res.json({
+        success: true,
+        message: 'Configuration de routage enregistrée avec succès',
+        config: configs[apiKey]
+    });
+});
+
+/**
+ * DELETE /api/routing_config
+ * Supprime la configuration de routage
+ */
+app.delete('/api/routing_config', (req, res) => {
+    const apiKey = req.apiKey;
+    const configs = loadRoutingConfigs();
+    
+    if (!configs[apiKey]) {
+        return res.status(404).json({
+            success: false,
+            message: 'Aucune configuration de routage trouvée'
+        });
+    }
+    
+    delete configs[apiKey];
+    saveRoutingConfigs(configs);
+    
+    res.json({
+        success: true,
+        message: 'Configuration de routage supprimée'
+    });
+});
+
+/**
+ * GET /api/routing/transactions
+ * Récupère les transactions avec info de routage
+ */
+app.get('/api/routing/transactions', (req, res) => {
+    const apiKey = req.apiKey;
+    const transactions = loadTransactions();
+    
+    // Filtrer par clé API et ajouter info de routage
+    const userTransactions = transactions
+        .filter(t => t.api_key === apiKey)
+        .map(t => ({
+            ...t,
+            routing_display: t.recipient_account === t.phone 
+                ? 'Paiement direct' 
+                : `Transfert vers ${t.recipient_name || t.recipient_account}`
+        }));
+    
+    res.json({
+        success: true,
+        count: userTransactions.length,
+        transactions: userTransactions
+    });
+});
+
+// ==========================================
 // SERVEUR
 // ==========================================
 
@@ -525,12 +700,18 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log(`🔌 API Base: http://localhost:${PORT}/api`);
     console.log('');
     console.log('Endpoints disponibles:');
-    console.log('  POST   /api/initiate_pay');
+    console.log('  POST   /api/initiate_pay          (avec routage vers compte spécifique)');
     console.log('  GET    /api/check_request?reference={ref}');
     console.log('  GET    /api/check_request/all');
     console.log('  POST   /api/update_status');
     console.log('  GET    /api/transactions');
     console.log('  DELETE /api/transactions');
+    console.log('');
+    console.log('🎯 ROUTAGE DES PAIEMENTS:');
+    console.log('  GET    /api/routing_config        (voir config)');
+    console.log('  POST   /api/routing_config        (configurer compte destination)');
+    console.log('  DELETE /api/routing_config      (supprimer config)');
+    console.log('  GET    /api/routing/transactions  (voir transactions avec routage)');
     console.log('');
 });
 
