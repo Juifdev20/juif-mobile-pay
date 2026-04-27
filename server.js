@@ -399,22 +399,22 @@ app.get('/api/check_request', (req, res) => {
 
 /**
  * GET /api/check_request/all
- * Récupère toutes les transactions (pour le simulateur)
+ * Récupère toutes les transactions (pour le simulateur/admin)
+ * Retourne TOUTES les transactions sans filtre par clé API
  */
 app.get('/api/check_request/all', (req, res) => {
-    const apiKey = req.apiKey;
     const transactions = loadTransactions();
-    // Filtrer par clé API
-    const userTransactions = transactions.filter(t => t.api_key === apiKey);
+    // Retourner toutes les transactions (sans filtre) pour que l'admin puisse voir tous les paiements
     res.json({
         success: true,
-        transactions: userTransactions
+        transactions: transactions
     });
 });
 
 /**
  * POST /api/update_status
  * Met à jour le statut d'une transaction
+ * Pour le simulateur/admin : permet de confirmer n'importe quelle transaction
  */
 app.post('/api/update_status', (req, res) => {
     const { reference, status } = req.body;
@@ -436,7 +436,8 @@ app.post('/api/update_status', (req, res) => {
     }
 
     const transactions = loadTransactions();
-    const transactionIndex = transactions.findIndex(t => t.reference === reference && t.api_key === apiKey);
+    // Retirer le filtre par clé API pour permettre à l'admin de confirmer n'importe quelle transaction
+    const transactionIndex = transactions.findIndex(t => t.reference === reference);
 
     if (transactionIndex === -1) {
         return res.status(404).json({
